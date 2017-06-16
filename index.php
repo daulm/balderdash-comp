@@ -12,6 +12,7 @@ session_start();
 <script type="text/javascript">
 
 var refresh_lobby = true;
+var refresh_review = false;
 var mytimer;
 // The rate in milliseconds at which the lobby refreshes
 var refresh_speed = 3000;
@@ -140,7 +141,7 @@ function startTimer(duration, display) {
 function launchGame(mode){
 	// kick off the game, either because of the game state, or because the host chose to launch the game
 	refresh_lobby = false;
-	var myreq = $.get("game.php", {mode: mode}, function(result){
+	var myreq = $.get("answer.php", function(result){
 		$("#bd_content").html(result);
 	});
 
@@ -148,6 +149,40 @@ function launchGame(mode){
 		var timeleft = $("#countdown").data("timeleft");
 		startTimer(timeleft, $("#countdown"));
 	});
+}
+	
+function showReview(){
+	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
+	it looks for a data attribute in the html to see if it is time to launch the game. */
+	
+	if (refresh_lobby){
+		var myreq = $.get("lobby.php?mode=update", function(result){
+			$("#sf_content").html(result);
+		});
+		
+		myreq.done(function(){
+			
+			if ($("#msglist").data("gamestate") > 0){
+				launchGame($("#msglist").data("gamestate"));
+			} else {
+				setTimeout(showLobby, refresh_speed);
+			}
+		});
+	}	
+}
+	
+function submitAnswer(){
+	// this function submits the answer
+	var ans = $("#answertxt").val();
+	if (ans.length > 2000 || ans.length < 1){
+		alert("Answer must be 1-2000 characters");
+		return 0;
+	}
+	var posting = $.post("review.php?mode=submit", {ans: ans}, function(result){
+		$("#bd_content").html(result);
+	});
+	refresh_review = true;
+	setTimeout(showReview, refresh_speed);
 }
 
 </script>
