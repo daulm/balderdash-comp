@@ -120,6 +120,16 @@ function returnLobby(){
 	refresh_lobby = true;
 	setTimeout(showLobby, refresh_speed);
 }
+	
+function timeUp(){
+	// this function is called if the timer reaches 0, it checks where it is and has the user send in any completed data
+	
+	//if it is an answer submission submit whatever they have completed
+	
+	//if it is voting submit nothing and move on to the results
+	
+	//if it is anything else, do nothing
+}
 
 function startTimer(duration, display) {
 	var timer = duration, minutes, seconds;
@@ -134,6 +144,7 @@ function startTimer(duration, display) {
 		display.text(minutes + ":" + seconds);
 		if(--timer < 0){
 			clearInterval(mytimer);
+			timeUp();
 		}
 	}, 1000);
 }
@@ -151,12 +162,25 @@ function launchGame(mode){
 	});
 }
 	
+function launchVote(mode){
+	// kick off the vote menu
+	refresh_review = false;
+	var myreq = $.get("vote.php", function(result){
+		$("#bd_content").html(result);
+	});
+
+	myreq.done(function(){
+		var timeleft = $("#countdown").data("timeleft");
+		startTimer(timeleft, $("#countdown"));
+	});	
+}
+	
 function showReview(){
 	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
 	it looks for a data attribute in the html to see if it is time to launch the game. */
 	
-	if (refresh_lobby){
-		var myreq = $.get("lobby.php?mode=update", function(result){
+	if (refresh_review){
+		var myreq = $.get("review.php?mode=update", function(result){
 			$("#sf_content").html(result);
 		});
 		
@@ -165,7 +189,7 @@ function showReview(){
 			if ($("#msglist").data("gamestate") > 0){
 				launchGame($("#msglist").data("gamestate"));
 			} else {
-				setTimeout(showLobby, refresh_speed);
+				setTimeout(showReview, refresh_speed);
 			}
 		});
 	}	
