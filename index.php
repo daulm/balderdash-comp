@@ -17,6 +17,24 @@ var mytimer;
 // The rate in milliseconds at which the lobby refreshes
 var refresh_speed = 3000;
 
+$(document).ready(function(){
+
+$(#settings).focusin(function (){
+	//stop refreshing the lobby if a user clicks on the settings
+	if ($("#msglist").data("gamestate") == 0){
+		refresh_lobby=true;
+	}
+});	
+	
+$(#settings).focusout(function (){
+	//resume refreshing the lobby if the host clicks away from the settings
+	if ($("#msglist").data("gamestate") == 0){
+		refresh_lobby=true;
+	}
+});	
+	
+});
+	
 function mainMenu(){
 	// this function loads the main menu of the game
 	refresh_lobby = false;
@@ -31,7 +49,7 @@ function showLobby(){
 	
 	if (refresh_lobby){
 		var myreq = $.get("lobby.php?mode=update", function(result){
-			$("#sf_content").html(result);
+			$("#bd_content").html(result);
 		});
 		
 		myreq.done(function(){
@@ -181,7 +199,7 @@ function showReview(){
 	
 	if (refresh_review){
 		var myreq = $.get("review.php?mode=update", function(result){
-			$("#sf_content").html(result);
+			$("#bd_content").html(result);
 		});
 		
 		myreq.done(function(){
