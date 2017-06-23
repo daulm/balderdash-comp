@@ -13,6 +13,7 @@ session_start();
 
 var refresh_lobby = true;
 var refresh_review = false;
+var refresh_results = false;
 var mytimer;
 // The rate in milliseconds at which the lobby refreshes
 var refresh_speed = 3000;
@@ -21,9 +22,8 @@ $(document).ready(function(){
 
 $(#settings).focusin(function (){
 	//stop refreshing the lobby if a user clicks on the settings
-	if ($("#msglist").data("gamestate") == 0){
-		refresh_lobby=true;
-	}
+	refresh_lobby=false;
+	
 });	
 	
 $(#settings).focusout(function (){
@@ -205,7 +205,7 @@ function showReview(){
 		myreq.done(function(){
 			
 			if ($("#msglist").data("gamestate") > 0){
-				launchGame($("#msglist").data("gamestate"));
+				launchVote($("#msglist").data("gamestate"));
 			} else {
 				setTimeout(showReview, refresh_speed);
 			}
@@ -226,6 +226,37 @@ function submitAnswer(){
 	refresh_review = true;
 	setTimeout(showReview, refresh_speed);
 }
+	
+function showResults(){
+	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
+	it looks for a data attribute in the html to see if it is time to launch the game. */
+	
+	if (refresh_results){
+		var myreq = $.get("review.php?mode=update", function(result){
+			$("#bd_content").html(result);
+		});
+		
+		myreq.done(function(){
+			
+			if ($("#msglist").data("gamestate") > 0){
+				launchVote($("#msglist").data("gamestate"));
+			} else {
+				setTimeout(showResults, refresh_speed);
+			}
+		});
+	}	
+}
+	
+function submitVote(){
+	// this function submits the vote
+	var vote = $("#voteid").val();
+
+	var posting = $.post("results.php?mode=submit", {voteid: vote}, function(result){
+		$("#bd_content").html(result);
+	});
+	refresh_results = true;
+	setTimeout(showResults, refresh_speed);
+}	
 
 </script>
 </head>
