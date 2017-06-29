@@ -141,12 +141,17 @@ function returnLobby(){
 	
 function timeUp(){
 	// this function is called if the timer reaches 0, it checks where it is and has the user send in any completed data
-	
-	//if it is an answer submission submit whatever they have completed
-	
-	//if it is voting submit nothing and move on to the results
-	
-	//if it is anything else, do nothing
+	switch($("#msglist").data("gamestate")){
+		case "answer":
+			//if it is an answer submission submit whatever they have completed
+			
+		case "vote":
+			//if it is voting submit nothing and move on to the results
+			
+		default:
+			//if it is anything else, do nothin
+			
+	}					      
 }
 
 function startTimer(duration, display) {
