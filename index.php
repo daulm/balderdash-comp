@@ -47,20 +47,22 @@ function showLobby(){
 	/* this function waits a few seconds and then refreshes the data in the lobby and then calls itself again
 	it looks for a data attribute in the html to see if it is time to launch the game. */
 	
-	if (refresh_lobby){
-		var myreq = $.get("lobby.php?mode=update", function(result){
+	
+	var myreq = $.get("lobby.php?mode=update", function(result){
+		if (refresh_lobby){
 			$("#bd_content").html(result);
-		});
+		}
+	});
+	
+	myreq.done(function(){
 		
-		myreq.done(function(){
-			
-			if ($("#msglist").data("gamestate") > 0){
-				launchGame($("#msglist").data("gamestate"));
-			} else {
-				setTimeout(showLobby, refresh_speed);
-			}
-		});
-	}
+		if ($("#msglist").data("gamestate") > 0){
+			launchGame($("#msglist").data("gamestate"));
+		} else {
+			setTimeout(showLobby, refresh_speed);
+		}
+	});
+	
 	
 }
 
@@ -123,13 +125,6 @@ function stopRefresh(){
 	refresh_lobby=false;	
 }
 
-/*
-$(#settings).focusout(function (){
-	//resume refreshing the lobby if the host clicks away from the settings
-	if ($("#msglist").data("gamestate") == 0){
-		refresh_lobby=true;
-	}
-});*/
 
 function returnLobby(){
 	$.get("lobby.php?mode=return", function(result){
@@ -144,10 +139,11 @@ function timeUp(){
 	switch($("#msglist").data("gamestate")){
 		case "answer":
 			//if it is an answer submission submit whatever they have completed
-			
+			submitAnswer(false);
 		case "vote":
 			//if it is voting submit nothing and move on to the results
-			
+			refresh_results = true;
+			setTimeout(showResults, refresh_speed);
 		default:
 			//if it is anything else, do nothin
 			
@@ -218,12 +214,14 @@ function showReview(){
 	}	
 }
 	
-function submitAnswer(){
+function submitAnswer(check){
 	// this function submits the answer
 	var ans = $("#answertxt").val();
-	if (ans.length > 2000 || ans.length < 1){
-		alert("Answer must be 1-2000 characters");
-		return 0;
+	if(check){
+		if (ans.length > 2000 || ans.length < 1){
+			alert("Answer must be 1-2000 characters");
+			return 0;
+		}
 	}
 	var posting = $.post("review.php?mode=submit", {ans: ans}, function(result){
 		$("#bd_content").html(result);
@@ -237,14 +235,14 @@ function showResults(){
 	it looks for a data attribute in the html to see if it is time to launch the game. */
 	
 	if (refresh_results){
-		var myreq = $.get("review.php?mode=update", function(result){
+		var myreq = $.get("results.php?mode=update", function(result){
 			$("#bd_content").html(result);
 		});
 		
 		myreq.done(function(){
 			
 			if ($("#msglist").data("gamestate") > 0){
-				launchVote($("#msglist").data("gamestate"));
+				refresh_results = false;
 			} else {
 				setTimeout(showResults, refresh_speed);
 			}
