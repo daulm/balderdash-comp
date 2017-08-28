@@ -18,10 +18,21 @@ if (!$con){
 $action_type = $_GET['mode'];
 switch ($action_type){
 	case "submit":
-		
+		// Add the answer
+		$sql = "INSERT INTO answer (Code, HostID, SpyCount, TimeLimit) VALUES ('".$code."', ".$_SESSION['Player_ID'].", 1, 5)";
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to submit the answer');
+		}
 		break;
 	case "update":
-		
+		if($_SESSION['Dasher']){
+			
+		} else {
+			//look up the game state
+			
+			echo '<div class="alert alert-info">';
+			echo '<strong>Hang On!</strong> The Dasher is still reviewing submissions.</div>';
+		}
 		break;
 		
 	default:
@@ -31,7 +42,6 @@ switch ($action_type){
 
 mysqli_close($con);
 ?>
-</div>
 <div id="footer"><button onclick="mainMenu()">Leave the Game</button></div>
 </body>
 </html>
