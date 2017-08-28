@@ -10,7 +10,7 @@ session_start();
 if (!isset($_SESSION['Player_ID'])){
 	die('Session lost, please reload the app.');
 }
-$con = mysqli_connect($db_host, $db_username, $db_pw, 'spyfall');
+$con = mysqli_connect($db_host, $db_username, $db_pw, 'bd');
 if (!$con){
 	die('DB connection failed: '.mysqli_error($con));
 }
@@ -20,7 +20,17 @@ if (!$con){
 
 mysqli_close($con);
 ?>
-</div>
-<div id="footer"><button onclick="mainMenu()">Leave the Game</button></div>
+  
+<div class="container">
+  <div class="well well-sm">BABBLEGANOOF</div>
+    <div class="input-group">
+      <textarea class="form-control custom-control" rows="3" placeholder="Enter your answer" name="answertxt" id="answertxt"></textarea>
+     
+        <span class="input-group-addon btn btn-primary" type="button" onclick="submitAnswer(1)">Submit</span>
+   
+    </div>
+</div>	
+	
+<div id="footer"><button type="button" class="btn" onclick="mainMenu()">Leave the Game</button></div>
 </body>
 </html>
