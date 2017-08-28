@@ -15,7 +15,17 @@ if (!$con){
 	die('DB connection failed: '.mysqli_error($con));
 }
 
-
+$action_type = $_GET['mode'];
+switch ($action_type){
+	case "submit":
+		
+		break;
+	case "update":
+		
+		break;
+		
+	default:
+}
 
 
 
