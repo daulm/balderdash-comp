@@ -55,16 +55,28 @@ mysqli_close($con);
 
 <body>
 
-<h2 id="banner">Spyfall</h2>
+<div id="titleback">
+	<div class="text-center" id="title">BALDERDASH</div>
+</div>
 
-<form name="entergame" id="entergame" method="post" action="" onSubmit="">
-Name:<br>
-<input type="text" name="playername" id="playername" maxlength="20" size="12" value="<?php echo htmlspecialchars($player_name) ?>"><br>
-Room Code:<br>
-<input type="text" name="code" id="code" maxlength="4" size="4"></form><br>
-<button id="join" onclick="enterLobby()">Join Game</button>
-<br>
-<button id="host" onclick="hostGame()">Host Game</button>
+<div class="container">
+<div class="input-group">
+	<span class="input-group-addon">Name</span>
+	<input type="text" name="playername" id="playername" class="form-control" maxlength="20" size="12" value="<?php echo htmlspecialchars($player_name) ?>">
+</div>
+<div class="input-group">
+	<span class="input-group-addon">Room Code</span>
+	<input type="text" name="code" id="code" class="form-control" maxlength="4" size="4">
+</div>
+<div class="btn-group btn-group-justified">
+	<div class="btn-group">
+	<button id="join" class="btn btn-primary" onclick="enterLobby()">Join Game</button>
+	</div>
+	<div class="btn-group">
+	<button id="host" class="btn btn-primary" onclick="hostGame()">Host Game</button>
+	</div>
+</div>
+</div>
 
 </body>
 </html>
