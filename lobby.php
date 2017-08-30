@@ -154,7 +154,23 @@ if(!$playerlist = mysqli_query($con, $sql)){
 <div id="titleback">
 	<div class="text-center" id="title">BALDERDASH</div>
 </div>
-<h2 class="text-center">Room Code:<b> <?php echo $code ?></b></h2>
+<div class="container-fluid">
+	<div class="col-xs-3"></div>
+	<div class="col-xs-6"><h2 class="text-center">Room Code:<b> <?php echo $code ?></b></h2></div>
+	<div class="col-xs-3 input-group">
+		<?php
+		//if you are host show form for changing scores
+		if(isset($_SESSION['Host'])){
+			echo '<input id="player_score" type="text" class="form-control" value="0" size="4">';
+    			echo '<div class="input-group-btn">';
+      			echo '	<button class="btn btn-success" type="submit">';
+        		echo '	<i class="glyphicon glyphicon-floppy-disk"></i>';
+      			echo '  </button>';
+    			echo '</div>';
+		}
+		?>
+      	</div>
+</div>
 <div id="players">
 <?php
 while($row = mysqli_fetch_row($playerlist)){
@@ -171,6 +187,30 @@ echo '</div><br><div id="settings">';
 
 if(isset($_SESSION['Host'])){
 	//show form for settings and button for kick off
+	?>
+	<div class="container-fluid well row">
+		<div class="col-xs-4">
+			<div class="input-group">
+				<span class="input-group-addon">AnsTime</span>
+				<input type="text" name="anstime" id="anstime" class="form-control" maxlength="20" size="4" value="<?php echo htmlspecialchars($player_name) ?>">
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="input-group">
+				<span class="input-group-addon">Vote Time</span>
+				<input type="text" name="votetime" id="votetime" class="form-control" maxlength="4" size="4">
+			</div>
+		</div>
+		<div class="col-xs-2">
+			<button type="submit" class="btn btn-default" onclick="lobbySettings()"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+		</div>
+		<div class="col-xs-2">
+			<button type="submit" class="btn btn-info" onclick="launchGame(0)">Start Round</span></button>
+		</div>
+	</div>
+	<?php
+	
+	/*
 	echo 'Spy Count:<input type="text" name="spy_count" id="spy_count" maxlength="2" size="1" onfocus="stopRefresh()" value="';
 	echo $spycount.'"> ';
 	echo 'Time Limit:<input type="text" name="timelimit" id="timelimit" maxlength="2" size="2" onfocus="stopRefresh()" value="';
@@ -179,14 +219,32 @@ if(isset($_SESSION['Host'])){
 	echo $allspy.'>Enable all-spy games ';
 	echo '<button onclick="lobbySettings()">Update</button><br>';
 	echo '<button onclick="launchGame(0)">Start Game</button>';
+	*/
 } else {
 	//show settings
 	echo 'Spy Count:'.$spycount;
 	echo ' Time Limit:'.$timelimit.'min';
 }
+	
+if(isset($_SESSION['Dasher'])){
+	?>
+	<div class="container">
+    		<div class="input-group">
+      			<span class="input-group-addon primary">Clue:</span>
+      			<textarea class="form-control custom-control" rows="3" placeholder="Enter your answer" name="answertxt" id="answertxt"></textarea>
+        		<span class="input-group-addon btn btn-primary" type="button" onclick="submitClue(1)">Submit</span>
+    		</div>
+	</div>
+	<?php
+} else {
+	echo '<div class="panel panel-info">';
+	echo '    <div class="panel-heading">'.$clue.'</div>';
+	echo '</div>';
+	
+}
 mysqli_close($con);
 ?>
 </div>
-<div id="footer"><button onclick="mainMenu()">Return to Main</button></div>
+<div id="footer"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
 </body>
 </html>
