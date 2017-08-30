@@ -74,9 +74,25 @@ switch ($action_type){
 			$_SESSION['Lobby_ID'] = $row[0];
 		}
 		$code = $_POST['code'];
+		$pname = $_POST['pname'];
+		//If a player already exists with the chosen name, add [the number of current players] to the end of their name
+		$sql = "SELECT p.PlayerName, (SELECT COUNT(*) FROM players WHERE LobbyID =".$_SESSION['Lobby_ID'].") as num";
+		$sql .= " FROM players p";
+		$sql .= " WHERE p.LobbyID = l.LobbyID AND l.LobbyID=".$_SESSION['Lobby_ID'];
+		$sql .= " AND p.LastCheck > NOW() - INTERVAL 15 SECOND";
+		$sql .= " AND p.PlayerName ='".$pname."'";
+		if(!$result = mysqli_query($con, $sql)){
+			echo('Cant find players in this game');
+		}
+		if(mysqli_num_rows($result) > 0){
+			//There was a player who already has that name
+			while($row = mysqli_fetch_row($result)){
+				$pname .= $row[1];	
+			}
+		}
 		
 		// Add player to the lobby and update their name
-		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".$_POST['pname']."'";
+		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".$pname."'";
 		$sql .= " WHERE PlayerID=".$_SESSION['Player_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
@@ -135,8 +151,10 @@ if(!$playerlist = mysqli_query($con, $sql)){
 
 ?>
 <span id="msglist" data-gamestate="<?php echo $gamestate ?>"></span>
-<h4 id="banner">Spyfall Lobby</h4>
-<h5>Room Code: <?php echo $code ?></h5>
+<div id="titleback">
+	<div class="text-center" id="title">BALDERDASH</div>
+</div>
+<h2 class="text-center">Room Code:<b> <?php echo $code ?></b></h2>
 <div id="players">
 <?php
 while($row = mysqli_fetch_row($playerlist)){
