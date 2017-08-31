@@ -19,6 +19,7 @@ var refresh_results = false;
 var mytimer;
 // The rate in milliseconds at which the lobby refreshes
 var refresh_speed = 3000;
+var $dasherid = 0;
 
 $(document).ready(function(){
 
@@ -118,8 +119,17 @@ function lobbySettings(){
 	
 function updateClue(){
 	// let's the dasher update the current clue
-	var $answertxt = $('#answertxt').val();
-	$.post("lobby.php?mode=clue", {answertxt: $answertxt}, function(result){
+	var $clue = $('#cluetxt').val();
+	$.post("lobby.php?mode=clue", {clue: $clue}, function(result){
+		$('#bd_content').html(result);
+	});
+	refresh_lobby = true;
+	setTimeout(showLobby, refresh_speed);	
+}
+	
+function updateDasher(dasherid){
+	// let's the host switch who the dasher is
+	$.post("lobby.php?mode=dasher", {dasherid: $dasherid}, function(result){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
