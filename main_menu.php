@@ -6,9 +6,10 @@ include 'db_config.php';
 session_start();
 unset($_SESSION['Host']);
 unset($_SESSION['Game_ID']);
+unset($_SESSION['Dasher']);
 
 // establish connection to DB
-$con = mysqli_connect($db_host, $db_username, $db_pw, 'spyfall');
+$con = mysqli_connect($db_host, $db_username, $db_pw, 'balderdash');
 if (!$con){
 	die('DB connection failed: '.mysqli_error($con));
 }
