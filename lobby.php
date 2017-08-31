@@ -219,6 +219,15 @@ if(isset($_SESSION['Host'])){
 			<button type="submit" class="btn btn-info" onclick="launchGame(0)">Start Round</span></button>
 		</div>
 	</div>
+	<style>
+	$(document).ready(function(){
+		var addclass = 'label label-success';
+		var $cols = $('.clicky').click(function(e) {
+    			$cols.removeClass(addclass);
+    			$(this).addClass(addclass);
+		});
+	});
+	</style>
 	<?php
 	
 	/*
@@ -257,5 +266,7 @@ mysqli_close($con);
 ?>
 </div>
 <div id="footer"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
+<?php
+
 </body>
 </html>
