@@ -103,23 +103,27 @@ function enterLobby(){
 
 function lobbySettings(){
 	// change the game settings in the lobby
-	var $allspy;
-	var $timelimit = $('#timelimit').val();
-	var $spy_count = $('#spy_count').val();
-	if (!$.isNumeric($timelimit) || !$.isNumeric($spy_count)){
+	var $anstime = $('#anstime').val();
+	var $votetime = $('#votetime').val();
+	if (!$.isNumeric($anstime) || !$.isNumeric($votetime)){
 		alert("Please enter integers");
 		return 0;
 	}
-	if($("#allspy").is(':checked')){
-		$allspy=1;
-	} else {
-		$allspy=0;
-	}
-	$.post("lobby.php?mode=settings", {timelimit: $timelimit, spy_count: $spy_count, allspy: $allspy}, function(result){
+	$.post("lobby.php?mode=settings", {anstime: $anstime, votetime: $votetime}, function(result){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
 	setTimeout(showLobby, refresh_speed);
+}
+	
+function updateClue(){
+	// let's the dasher update the current clue
+	var $answertxt = $('#answertxt').val();
+	$.post("lobby.php?mode=clue", {answertxt: $answertxt}, function(result){
+		$('#bd_content').html(result);
+	});
+	refresh_lobby = true;
+	setTimeout(showLobby, refresh_speed);	
 }
 
 function stopRefresh(){
@@ -200,20 +204,22 @@ function showReview(){
 	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
 	it looks for a data attribute in the html to see if it is time to launch the game. */
 	
-	if (refresh_review){
-		var myreq = $.get("review.php?mode=update", function(result){
+	
+	var myreq = $.get("review.php?mode=update", function(result){
+		if (refresh_review){		
 			$("#bd_content").html(result);
-		});
+		}
+	});
 		
-		myreq.done(function(){
+	myreq.done(function(){
 			
-			if ($("#msglist").data("gamestate") > 0){
-				launchVote($("#msglist").data("gamestate"));
-			} else {
-				setTimeout(showReview, refresh_speed);
-			}
-		});
-	}	
+		if ($("#msglist").data("gamestate") > 0){
+			launchVote($("#msglist").data("gamestate"));
+		} else {
+			setTimeout(showReview, refresh_speed);
+		}
+	});
+		
 }
 	
 function submitAnswer(check){
@@ -236,20 +242,22 @@ function showResults(){
 	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
 	it looks for a data attribute in the html to see if it is time to launch the game. */
 	
-	if (refresh_results){
-		var myreq = $.get("results.php?mode=update", function(result){
+	
+	var myreq = $.get("results.php?mode=update", function(result){
+		if (refresh_results){
 			$("#bd_content").html(result);
-		});
+		}
+	});
 		
-		myreq.done(function(){
+	myreq.done(function(){
 			
-			if ($("#msglist").data("gamestate") > 0){
-				refresh_results = false;
-			} else {
-				setTimeout(showResults, refresh_speed);
-			}
-		});
-	}	
+		if ($("#msglist").data("gamestate") > 0){
+			refresh_results = false;
+		} else {
+			setTimeout(showResults, refresh_speed);
+		}
+	});
+		
 }
 	
 function submitVote(){
