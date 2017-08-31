@@ -171,17 +171,28 @@ if(!$playerlist = mysqli_query($con, $sql)){
 		?>
       	</div>
 </div>
-<div id="players">
+<div id="players" class="container-fluid">
 <?php
+$clicky = "";
+if(isset($_SESSION['Host'])){
+	$clicky = " clicky"
+}
 while($row = mysqli_fetch_row($playerlist)){
-	//[0]-playername [1]-PlayerID [2]-HostID [3]-active?
+	//[0]-playername [1]-PlayerID [2]-HostID [3]-dasherID?
 	if($row[1] == $row[2]){
 		// this player should be identified as the host
-		$note = "<i>(Host)</i>";
+		$note = "<i>(H)</i>";
 	}else {
 		$note = "";
 	}
-	echo '<section style="color:'.$row[3].'">'.$row[0].$note."</section>";
+	if($row[1] == $row[3]){
+		// this player should be identified as the dasher
+		$dasher = " label label-success";
+	}else {
+		$dasher = "";
+	}
+	echo '<div class="col-xs-6 col-sm-4 col-md-3'.$clicky.$dasher.'">'.$row[0].$note;
+	echo '<span class="badge">'.$row[4].'</span></div>';
 }
 echo '</div><br><div id="settings">';
 
