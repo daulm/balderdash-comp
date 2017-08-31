@@ -29,7 +29,16 @@ switch ($action_type){
 			
 		} else {
 			//look up the game state
-			
+			$gamestate = "";
+			$sql = "SELECT l.GameState FROM lobby l, players p";
+			$sql .= " WHERE p.LobbyID = l.LobbyID AND p.PlayerID=".$_SESSION['Player_ID'];
+			if(!$result = mysqli_query($con, $sql)){
+				echo('Cant find code for this lobby');
+			}
+			while($row = mysqli_fetch_row($result)){
+				$gamestate = $row[0];
+			}
+			echo '<span id="msglist" data-gamestate="'.$gamestate.'"></span>';
 			echo '<div class="alert alert-info">';
 			echo '<strong>Hang On!</strong> The Dasher is still reviewing submissions.</div>';
 		}
