@@ -60,7 +60,7 @@ mysqli_close($con);
 	<div class="text-center" id="title">BALDERDASH</div>
 </div>
 
-<div class="container">
+<div class="container" style="padding-top: 10px">
 <div class="input-group">
 	<span class="input-group-addon">Name</span>
 	<input type="text" name="playername" id="playername" class="form-control" maxlength="20" size="12" value="<?php echo htmlspecialchars($player_name) ?>">
