@@ -179,7 +179,7 @@ if(!$playerlist = mysqli_query($con, $sql)){
 <div class="container-fluid">
 	<div class="col-xs-3"></div>
 	<div class="col-xs-6"><h2 class="text-center">Room Code:<b> <?php echo $code ?></b></h2></div>
-	<div class="col-xs-3 input-group">
+	<div class="col-xs-3"><div class="input-group">
 		<?php
 		//if you are host show form for changing scores
 		if(isset($_SESSION['Host'])){
@@ -191,7 +191,7 @@ if(!$playerlist = mysqli_query($con, $sql)){
     			echo '</div>';
 		}
 		?>
-      	</div>
+	</div></div>
 </div>
 <div id="players" class="container-fluid">
 <?php
@@ -267,7 +267,7 @@ if(isset($_SESSION['Dasher'])){
 mysqli_close($con);
 ?>
 
-<div id="footer"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
+<div id="footer" class="text-center"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
 
 
 </body>
