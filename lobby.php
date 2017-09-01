@@ -197,7 +197,7 @@ if(!$playerlist = mysqli_query($con, $sql)){
 <?php
 $clicky = "";
 if(isset($_SESSION['Host'])){
-	$clicky = " clicky"
+	$clicky = " clicky";
 }
 while($row = mysqli_fetch_row($playerlist)){
 	//[0]-playername [1]-PlayerID [2]-HostID [3]-DasherID [4]-Score
