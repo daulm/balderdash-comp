@@ -53,7 +53,7 @@ switch ($action_type){
 		}
 		
 		//update the current lobby the player is in and their name
-		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".$_POST['pname']."'";
+		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".mysql_real_escape_string($_POST['pname'])."'";
 		$sql .= " WHERE PlayerID=".$_SESSION['Player_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
@@ -64,7 +64,7 @@ switch ($action_type){
 		break;
 	case "join":
 		// check that the code is correct and the lobby was created in the past 24 hours
-		$sql = "SELECT LobbyID FROM lobby WHERE Code=UPPER('".$_POST['code']."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+		$sql = "SELECT LobbyID FROM lobby WHERE Code=UPPER('".mysql_real_escape_string($_POST['code'])."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
 		if(!$result = mysqli_query($con, $sql)){
 			echo('Cant find a Lobby with the given code.');
 		}		
@@ -75,8 +75,8 @@ switch ($action_type){
 		while($row = mysqli_fetch_row($result)){
 			$_SESSION['Lobby_ID'] = $row[0];
 		}
-		$code = $_POST['code'];
-		$pname = $_POST['pname'];
+		$code = mysql_real_escape_string($_POST['code']);
+		$pname = mysql_real_escape_string($_POST['pname']);
 		//If a player already exists with the chosen name, add [the number of current players] to the end of their name
 		$sql = "SELECT p.PlayerName, (SELECT COUNT(*) FROM players WHERE LobbyID =".$_SESSION['Lobby_ID'].") as num";
 		$sql .= " FROM players p";
@@ -110,22 +110,30 @@ switch ($action_type){
 		}
 		break;
 	case "settings":
-		$sql = "UPDATE lobby SET SpyCount=".$_POST['spy_count'].", TimeLimit=".$_POST['timelimit'].", AllSpy=".$_POST['allspy'];
+		$sql = "UPDATE lobby SET AnswerTime=".mysql_real_escape_string($_POST['anstime']).", VoteTime=".mysql_real_escape_string($_POST['votetime']);
 		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}		
 		break;
 	case "clue":
-		$sql = "UPDATE lobby SET Clue='".$_POST['clue']."'";
+		$sql = "UPDATE lobby SET Clue='".mysql_real_escape_string($_POST['clue'])."'";
 		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}
 		break;
 	case "dasher":
-		$sql = "UPDATE lobby SET DasherID=".$_POST['dasherid'];
+		$sql = "UPDATE lobby SET DasherID=".mysql_real_escape_string($_POST['dasherid']);
 		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to add player ID to the lobby');
+		}
+		break;
+	case "dasherscore":
+		$sql = "UPDATE players SET Score=".mysql_real_escape_string($_POST['dasherscore']);
+		$sql .= " WHERE PlayerID= (SELECT DasherID FROM lobby";
+		$sql .= "  WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'].")";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}
@@ -139,8 +147,9 @@ switch ($action_type){
 }
 
 //query to pull room code, game state, and time limits
-$sql = "SELECT l.Code, l.GameState, l.AnsTime, l.VoteTime FROM lobby l, players p";
+$sql = "SELECT l.Code, l.GameState, l.AnsTime, l.VoteTime, dp.Score FROM lobby l, players p, players dp";
 $sql .= " WHERE p.LobbyID = l.LobbyID AND p.PlayerID=".$_SESSION['Player_ID'];
+$sql .= " AND l.DasherID = dp.PlayerID";
 if(!$result = mysqli_query($con, $sql)){
 	echo('Cant find code for this lobby');
 }	
@@ -149,6 +158,7 @@ while($row = mysqli_fetch_row($result)){
 	$gamestate = $row[1];
 	$anstime = $row[2];
 	$votetime = $row[3];
+	$dasherscore = $row[4];
 }
 
 //query to pull player list
@@ -173,9 +183,9 @@ if(!$playerlist = mysqli_query($con, $sql)){
 		<?php
 		//if you are host show form for changing scores
 		if(isset($_SESSION['Host'])){
-			echo '<input id="player_score" type="text" class="form-control" value="0" size="4">';
+			echo '<input id="player_score" type="text" class="form-control" value="'.$dasherscore.'" size="4">';
     			echo '<div class="input-group-btn">';
-      			echo '	<button class="btn btn-success" type="submit">';
+      			echo '	<button class="btn btn-success" type="submit" onclick="updateDasherScore()>';
         		echo '	<i class="glyphicon glyphicon-floppy-disk"></i>';
       			echo '  </button>';
     			echo '</div>';
@@ -203,7 +213,7 @@ while($row = mysqli_fetch_row($playerlist)){
 	}else {
 		$dasher = "";
 	}
-	echo '<div class="col-xs-6 col-sm-4 col-md-3'.$clicky.$dasher.'">'.$row[0].$note;
+	echo '<div class="col-xs-6 col-sm-4 col-md-3'.$clicky.$dasher.'" data-playerid="'.$row[1].'">'.$row[0].$note;
 	echo '<span class="badge">'.$row[4].'</span></div>';
 }
 echo '</div>';
@@ -211,7 +221,7 @@ echo '</div>';
 if(isset($_SESSION['Host'])){
 	//show form for settings and button for kick off
 	?>
-	<div class="container-fluid well row" id="settings">
+	<div class="container-fluid well well-sm row" id="settings">
 		<div class="col-xs-4">
 			<div class="input-group">
 				<span class="input-group-addon">AnsTime</span>
@@ -221,41 +231,21 @@ if(isset($_SESSION['Host'])){
 		<div class="col-xs-4">
 			<div class="input-group">
 				<span class="input-group-addon">Vote Time</span>
-				<input type="text" name="votetime" id="votetime" class="form-control" maxlength="4" size="4">
+				<input type="text" name="votetime" id="votetime" class="form-control" maxlength="4" size="4" value="<?php echo htmlspecialchars($votetime) ?>">
 			</div>
 		</div>
 		<div class="col-xs-2">
 			<button type="submit" class="btn btn-default" onclick="lobbySettings()"><span class="glyphicon glyphicon-floppy-disk"></span></button>
 		</div>
 		<div class="col-xs-2">
-			<button type="submit" class="btn btn-info" onclick="launchGame(0)">Start Round</span></button>
+			<button type="submit" class="btn btn-info" onclick="launchGame()">Start Round</span></button>
 		</div>
 	</div>
-	<style>
-	$(document).ready(function(){
-		var addclass = 'label label-success';
-		var $cols = $('.clicky').click(function(e) {
-    			$cols.removeClass(addclass);
-    			$(this).addClass(addclass);
-		});
-	});
-	</style>
 	<?php
-	
-	/*
-	echo 'Spy Count:<input type="text" name="spy_count" id="spy_count" maxlength="2" size="1" onfocus="stopRefresh()" value="';
-	echo $spycount.'"> ';
-	echo 'Time Limit:<input type="text" name="timelimit" id="timelimit" maxlength="2" size="2" onfocus="stopRefresh()" value="';
-	echo $timelimit.'">min ';
-	echo '<input type="checkbox" name="allspy" id="allspy" onfocus="stopRefresh()" value="included" ';
-	echo $allspy.'>Enable all-spy games ';
-	echo '<button onclick="lobbySettings()">Update</button><br>';
-	echo '<button onclick="launchGame(0)">Start Game</button>';
-	*/
 } else {
 	//show settings
-	echo 'Answer Time:'.$anstime;
-	echo ' Vote Time:'.$votetime.'min';
+	echo '<div class="container-fluid well well-sm text-center">Answer Time:'.$anstime;
+	echo 'min Vote Time:'.$votetime.'min</div>';
 }
 	
 if(isset($_SESSION['Dasher'])){
@@ -270,7 +260,7 @@ if(isset($_SESSION['Dasher'])){
 	<?php
 } else {
 	echo '<div class="panel panel-info">';
-	echo '    <div class="panel-heading">'.$clue.'</div>';
+	echo '    <div class="panel-heading">'.htmlspecialchars($clue).'</div>';
 	echo '</div>';
 	
 }
