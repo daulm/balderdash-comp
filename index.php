@@ -31,10 +31,16 @@ $("#settings").focusin(function (){
 	
 $("#settings").focusout(function (){
 	//resume refreshing the lobby if the host clicks away from the settings
-	if ($("#msglist").data("gamestate") == 0){
+	if ($("#msglist").data("gamestate") == "lobby"){
 		refresh_lobby=true;
 	}
-});	
+});
+	
+$('.clicky').click(function(e) {
+	/*This function should only be used by the host when changing who is set as the dasher*/
+	var $newdasher = $(this).data("playerid");
+	updateDasher($newdasher);
+});
 	
 });
 	
@@ -127,7 +133,7 @@ function updateClue(){
 	setTimeout(showLobby, refresh_speed);	
 }
 	
-function updateDasher(dasherid){
+function updateDasher($dasherid){
 	// let's the host switch who the dasher is
 	$.post("lobby.php?mode=dasher", {dasherid: $dasherid}, function(result){
 		$('#bd_content').html(result);
@@ -136,6 +142,16 @@ function updateDasher(dasherid){
 	setTimeout(showLobby, refresh_speed);	
 }
 
+function updateDasherScore(){
+	// let's the host switch who the dasher is
+	var $newscore = $('#player_score').val();
+	$.post("lobby.php?mode=dasherscore", {dasherscore: $newscore}, function(result){
+		$('#bd_content').html(result);
+	});
+	refresh_lobby = true;
+	setTimeout(showLobby, refresh_speed);	
+}	
+	
 function stopRefresh(){
 	//stop refreshing if the host is trying to change the settings
 	refresh_lobby=false;	
@@ -184,7 +200,7 @@ function startTimer(duration, display) {
 	}, 1000);
 }
 
-function launchGame(mode){
+function launchGame(){
 	// kick off the game, either because of the game state, or because the host chose to launch the game
 	refresh_lobby = false;
 	var myreq = $.get("answer.php", function(result){
@@ -197,7 +213,7 @@ function launchGame(mode){
 	});
 }
 	
-function launchVote(mode){
+function launchVote(){
 	// kick off the vote menu
 	refresh_review = false;
 	var myreq = $.get("vote.php", function(result){
@@ -212,7 +228,7 @@ function launchVote(mode){
 	
 function showReview(){
 	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
-	it looks for a data attribute in the html to see if it is time to launch the game. */
+	it looks for a data attribute in the html to see if it is time to kick off voting. */
 	
 	
 	var myreq = $.get("review.php?mode=update", function(result){
@@ -223,8 +239,8 @@ function showReview(){
 		
 	myreq.done(function(){
 			
-		if ($("#msglist").data("gamestate") > 0){
-			launchVote($("#msglist").data("gamestate"));
+		if ($("#msglist").data("gamestate") == "vote"){
+			launchVote();
 		} else {
 			setTimeout(showReview, refresh_speed);
 		}
@@ -261,7 +277,7 @@ function showResults(){
 		
 	myreq.done(function(){
 			
-		if ($("#msglist").data("gamestate") > 0){
+		if ($("#msglist").data("gamestate") != "results"){
 			refresh_results = false;
 		} else {
 			setTimeout(showResults, refresh_speed);
