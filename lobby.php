@@ -268,7 +268,7 @@ mysqli_close($con);
 ?>
 
 <div id="footer"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
-<?php
+
 
 </body>
 </html>
