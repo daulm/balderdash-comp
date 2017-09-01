@@ -23,13 +23,13 @@ var $dasherid = 0;
 
 $(document).ready(function(){
 
-$("#settings").focusin(function (){
+$(".settings").focusin(function (){
 	//stop refreshing the lobby if a user clicks on the settings
 	refresh_lobby=false;
 	
 });	
 	
-$("#settings").focusout(function (){
+$(".settings").focusout(function (){
 	//resume refreshing the lobby if the host clicks away from the settings
 	if ($("#msglist").data("gamestate") == "lobby"){
 		refresh_lobby=true;
