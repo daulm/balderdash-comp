@@ -147,7 +147,7 @@ switch ($action_type){
 }
 
 //query to pull room code, game state, and time limits
-$sql = "SELECT l.Code, l.GameState, l.AnsTime, l.VoteTime, dp.Score FROM lobby l, players p, players dp";
+$sql = "SELECT l.Code, l.GameState, l.AnswerTime, l.VoteTime, dp.Score FROM lobby l, players p, players dp";
 $sql .= " WHERE p.LobbyID = l.LobbyID AND p.PlayerID=".$_SESSION['Player_ID'];
 $sql .= " AND l.DasherID = dp.PlayerID";
 if(!$result = mysqli_query($con, $sql)){
