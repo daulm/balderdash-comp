@@ -183,7 +183,7 @@ if(!$playerlist = mysqli_query($con, $sql)){
 		<?php
 		//if you are host show form for changing scores
 		if(isset($_SESSION['Host'])){
-			echo '<input id="player_score" type="text" class="form-control" value="'.$dasherscore.'" size="4">';
+			echo '<input id="player_score" type="text" class="form-control settings" value="'.$dasherscore.'" size="4">';
     			echo '<div class="input-group-btn">';
       			echo '	<button class="btn btn-success" type="submit" onclick="updateDasherScore()>';
         		echo '	<i class="glyphicon glyphicon-floppy-disk"></i>';
@@ -225,13 +225,13 @@ if(isset($_SESSION['Host'])){
 		<div class="col-xs-4">
 			<div class="input-group">
 				<span class="input-group-addon">AnsTime</span>
-				<input type="text" name="anstime" id="anstime" class="form-control" maxlength="4" size="4" value="<?php echo htmlspecialchars($anstime) ?>">
+				<input type="text" name="anstime" id="anstime" class="form-control settings" maxlength="4" size="4" value="<?php echo htmlspecialchars($anstime) ?>">
 			</div>
 		</div>
 		<div class="col-xs-4">
 			<div class="input-group">
 				<span class="input-group-addon">Vote Time</span>
-				<input type="text" name="votetime" id="votetime" class="form-control" maxlength="4" size="4" value="<?php echo htmlspecialchars($votetime) ?>">
+				<input type="text" name="votetime" id="votetime" class="form-control settings" maxlength="4" size="4" value="<?php echo htmlspecialchars($votetime) ?>">
 			</div>
 		</div>
 		<div class="col-xs-2">
@@ -253,7 +253,7 @@ if(isset($_SESSION['Dasher'])){
 	<div class="container">
     		<div class="input-group">
       			<span class="input-group-addon primary">Clue:</span>
-      			<textarea class="form-control custom-control" rows="3" placeholder="Enter the clue" name="cluetxt" id="cluetxt"></textarea>
+      			<textarea class="form-control custom-control settings" rows="3" placeholder="Enter the clue" name="cluetxt" id="cluetxt"></textarea>
         		<span class="input-group-addon btn btn-primary" type="button" onclick="submitClue(1)">Submit</span>
     		</div>
 	</div>
