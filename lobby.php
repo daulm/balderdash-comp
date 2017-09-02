@@ -69,7 +69,8 @@ switch ($action_type){
 			echo('Cant find a Lobby with the given code.');
 		}		
 		if(mysqli_num_rows($result) == 0){
-			echo('Cant find a Lobby with the given code');
+			echo ('<frame onload="alert(\'Cant find a Lobby with the given code\')">wrong code</frame>');
+			exit('<br><frame onload="mainMenu()">Return to Main</frame>');
 			break;
 		}		
 		while($row = mysqli_fetch_row($result)){
@@ -79,7 +80,7 @@ switch ($action_type){
 		$pname = mysql_real_escape_string($_POST['pname']);
 		//If a player already exists with the chosen name, add [the number of current players] to the end of their name
 		$sql = "SELECT p.PlayerName, (SELECT COUNT(*) FROM players WHERE LobbyID =".$_SESSION['Lobby_ID'].") as num";
-		$sql .= " FROM players p";
+		$sql .= " FROM players p, lobby l";
 		$sql .= " WHERE p.LobbyID = l.LobbyID AND l.LobbyID=".$_SESSION['Lobby_ID'];
 		$sql .= " AND p.LastCheck > NOW() - INTERVAL 15 SECOND";
 		$sql .= " AND p.PlayerName ='".$pname."'";
@@ -118,7 +119,7 @@ switch ($action_type){
 		break;
 	case "clue":
 		$sql = "UPDATE lobby SET Clue='".mysql_real_escape_string($_POST['clue'])."'";
-		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
+		$sql .= " WHERE DasherID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}
@@ -146,12 +147,13 @@ switch ($action_type){
 	default:			
 }
 
-//query to pull room code, game state, and time limits
-$sql = "SELECT l.Code, l.GameState, l.AnswerTime, l.VoteTime, dp.Score FROM lobby l, players p, players dp";
+//query to pull room code, game state, clue, dasher score, and time limits
+$sql = "SELECT l.Code, l.GameState, l.AnswerTime, l.VoteTime, dp.Score, l.Clue, l.DasherID FROM lobby l, players p, players dp";
 $sql .= " WHERE p.LobbyID = l.LobbyID AND p.PlayerID=".$_SESSION['Player_ID'];
 $sql .= " AND l.DasherID = dp.PlayerID";
 if(!$result = mysqli_query($con, $sql)){
 	echo('Cant find code for this lobby');
+	exit('<button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button>');
 }	
 while($row = mysqli_fetch_row($result)){
 	$code = $row[0];
@@ -159,6 +161,12 @@ while($row = mysqli_fetch_row($result)){
 	$anstime = $row[2];
 	$votetime = $row[3];
 	$dasherscore = $row[4];
+	$clue = $row[5];
+	if($row[6] == $_SESSION['Player_ID']){
+		$_SESSION['Dasher']=true;
+	} else {
+		unset($_SESSION['Dasher']);
+	}
 }
 
 //query to pull player list
@@ -177,15 +185,14 @@ if(!$playerlist = mysqli_query($con, $sql)){
 	<div class="text-center" id="title">BALDERDASH</div>
 </div>
 <div class="container-fluid">
-	<div class="col-xs-3"></div>
-	<div class="col-xs-6"><h2 class="text-center">Room Code:<b> <?php echo $code ?></b></h2></div>
-	<div class="col-xs-3"><div class="input-group">
+	<div class="col-xs-6"><h2 class="text-left">Room Code:<b> <?php echo $code ?></b></h2></div>
+	<div class="col-xs-6 text-right"><div class="input-group settings">
 		<?php
 		//if you are host show form for changing scores
 		if(isset($_SESSION['Host'])){
-			echo '<input id="player_score" type="text" class="form-control settings" value="'.$dasherscore.'" size="4">';
+			echo '<input id="player_score" type="text" class="form-control" value="'.$dasherscore.'" size="4">';
     			echo '<div class="input-group-btn">';
-      			echo '	<button class="btn btn-success" type="submit" onclick="updateDasherScore()>';
+      			echo '	<button class="btn btn-success" type="submit" onclick="updateDasherScore()">';
         		echo '	<i class="glyphicon glyphicon-floppy-disk"></i>';
       			echo '  </button>';
     			echo '</div>';
@@ -216,54 +223,54 @@ while($row = mysqli_fetch_row($playerlist)){
 	echo '<div class="col-xs-6 col-sm-4 col-md-3'.$clicky.$dasher.'" data-playerid="'.$row[1].'">'.$row[0].$note;
 	echo '<span class="badge">'.$row[4].'</span></div>';
 }
-echo '</div>';
+echo '</div><br>';
 
 if(isset($_SESSION['Host'])){
 	//show form for settings and button for kick off
 	?>
-	<div class="container-fluid well well-sm row" id="settings">
-		<div class="col-xs-4">
+	<div class="container-fluid well well-sm row settings" id="settings">
+		<div class="col-xs-5 col-sm-4">
 			<div class="input-group">
 				<span class="input-group-addon">AnsTime</span>
-				<input type="text" name="anstime" id="anstime" class="form-control settings" maxlength="4" size="4" value="<?php echo htmlspecialchars($anstime) ?>">
+				<input type="text" name="anstime" id="anstime" class="form-control" maxlength="4" size="4" value="<?php echo htmlspecialchars($anstime) ?>">
 			</div>
 		</div>
-		<div class="col-xs-4">
+		<div class="col-xs-5 col-sm-4">
 			<div class="input-group">
 				<span class="input-group-addon">Vote Time</span>
-				<input type="text" name="votetime" id="votetime" class="form-control settings" maxlength="4" size="4" value="<?php echo htmlspecialchars($votetime) ?>">
+				<input type="text" name="votetime" id="votetime" class="form-control" maxlength="4" size="4" value="<?php echo htmlspecialchars($votetime) ?>">
 			</div>
 		</div>
-		<div class="col-xs-2">
+		<div class="col-xs-2 col-sm-2">
 			<button type="submit" class="btn btn-default" onclick="lobbySettings()"><span class="glyphicon glyphicon-floppy-disk"></span></button>
 		</div>
-		<div class="col-xs-2">
+		<div class="col-xs-2 col-sm-2">
 			<button type="submit" class="btn btn-info" onclick="launchGame()">Start Round</span></button>
 		</div>
 	</div>
 	<?php
 } else {
 	//show settings
-	echo '<div class="container-fluid well well-sm text-center">Answer Time:'.$anstime;
-	echo 'min Vote Time:'.$votetime.'min</div>';
+	echo '<div class="container-fluid well well-sm text-center">Answer Time: '.$anstime;
+	echo 'min | Vote Time: '.$votetime.'min</div>';
 }
-	
+
+	echo '<div class="panel panel-info">';
+	echo '    <div class="panel-heading">'.htmlspecialchars($clue).'</div>';
+	echo '</div>';
+
 if(isset($_SESSION['Dasher'])){
 	?>
 	<div class="container">
     		<div class="input-group">
       			<span class="input-group-addon primary">Clue:</span>
       			<textarea class="form-control custom-control settings" rows="3" placeholder="Enter the clue" name="cluetxt" id="cluetxt"></textarea>
-        		<span class="input-group-addon btn btn-primary" type="button" onclick="submitClue(1)">Submit</span>
+        		<span class="input-group-addon btn btn-primary" type="button" onclick="updateClue()">Submit</span>
     		</div>
 	</div>
 	<?php
-} else {
-	echo '<div class="panel panel-info">';
-	echo '    <div class="panel-heading">'.htmlspecialchars($clue).'</div>';
-	echo '</div>';
-	
 }
+
 mysqli_close($con);
 ?>
 

@@ -2,7 +2,6 @@
 <?php
 session_start();
 ?>
-
 <html>
 <head>
 <title>Balderdash</title>
@@ -12,17 +11,19 @@ session_start();
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <script src="js/jquery.min.js"></script>
 <script type="text/javascript">
-
 var refresh_lobby = true;
 var refresh_review = false;
 var refresh_results = false;
 var mytimer;
 // The rate in milliseconds at which the lobby refreshes
-var refresh_speed = 3000;
+var refresh_speed = 1000;
 var $dasherid = 0;
 
 $(document).ready(function(){
+	initialise();
+});
 
+function initialise(){
 $(".settings").focusin(function (){
 	//stop refreshing the lobby if a user clicks on the settings
 	refresh_lobby=false;
@@ -36,13 +37,13 @@ $(".settings").focusout(function (){
 	}
 });
 	
-$('.clicky').click(function(e) {
-	/*This function should only be used by the host when changing who is set as the dasher*/
+$('.clicky').click(function() {
+	//This function should only be used by the host when changing who is set as the dasher
 	var $newdasher = $(this).data("playerid");
 	updateDasher($newdasher);
 });
-	
-});
+
+}
 	
 function mainMenu(){
 	// this function loads the main menu of the game
@@ -64,7 +65,7 @@ function showLobby(){
 	});
 	
 	myreq.done(function(){
-		
+		initialise();
 		if ($("#msglist").data("gamestate") > 0){
 			launchGame($("#msglist").data("gamestate"));
 		} else {
