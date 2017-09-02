@@ -16,8 +16,15 @@ if (!$con){
 }
 
 //Look up the clue and time limit
-
-
+$sql = "SELECT Clue, AnswerTime FROM lobby";
+$sql .= " WHERE LobbyID=".$_SESSION['Lobby_ID'];
+if(!$result = mysqli_query($con, $sql)){
+	echo('Cant find code for this lobby');
+}	
+while($row = mysqli_fetch_row($result)){
+	$clue = $row[0];
+	$timeleft = $row[1];
+}
 
 mysqli_close($con);
 ?>
