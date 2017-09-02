@@ -15,6 +15,7 @@ if (!$con){
 	die('DB connection failed: '.mysqli_error($con));
 }
 
+//Look up the clue and time limit
 
 
 
@@ -22,15 +23,16 @@ mysqli_close($con);
 ?>
   
 <div class="container">
-  <div class="well well-sm">BABBLEGANOOF</div>
-    <div class="input-group">
-      <textarea class="form-control custom-control" rows="3" placeholder="Enter your answer" name="answertxt" id="answertxt"></textarea>
-     
-        <span class="input-group-addon btn btn-primary" type="button" onclick="submitAnswer(1)">Submit</span>
-   
-    </div>
+	<div class="well well-sm">
+		<div class="col-xs-9"><?php echo htmlspecialchars($clue) ?></div>
+	  	<div class="col-xs-3">Time Left: <span id="countdown" data-timeleft="<?php htmlspecialchars($timeleft) ?>"></span></div>
+  	</div>
+	
+    	<div class="input-group">
+      		<textarea class="form-control custom-control" rows="3" placeholder="Enter your answer" name="answertxt" id="answertxt"></textarea>
+        	<span class="input-group-addon btn btn-primary" type="button" onclick="submitAnswer(1)">Submit</span>
+    	</div>
 </div>	
 	
-<div id="footer"><button type="button" class="btn" onclick="mainMenu()">Leave the Game</button></div>
 </body>
 </html>
