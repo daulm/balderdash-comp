@@ -46,6 +46,12 @@ if(isset($_SESSION['Host'])){
 	if(!mysqli_query($con, $sql)){
 		echo('Unable to sync Game to Lobby');
 	}
+	
+	//set a random order for player names/answers/scores to appear for this game
+	$sql = "UPDATE players SET OrderVal=RAND() WHERE LobbyID=".$_SESSION['Lobby_ID'];
+	if(!mysqli_query($con, $sql)){
+		echo('Unable to sync Game to Lobby');
+	}
 }
 
 //set the gameid to the session
