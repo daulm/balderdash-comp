@@ -37,36 +37,31 @@ switch ($action_type){
 			}
 			
 			//pull all the players in this game, and show their answers if they have been submitted
-			/*
-			SELECT p.PlayerID, p.PlayerName, a.AnswerText, a.BindAnswerID, AnswerID
-			FROM players p, answers a
-			WHERE p.GameID = session_gameid
-			AND a.GameID = session_gameid
-			AND p.PlayerID = a.PlayerID
-			
-			SELECT p.PlayerID, p.PlayerName, NULL, NULL, NULL
-			FROM players p
-			WHERE NOT EXISTS (
-				SELECT * FROM answers
-				WHERE  
-			)
-			SELECT *
-			FROM players p
-			LEFT JOIN answers a
-			ON p.PlayerID = a.PlayerID AND p.GameID = a.GameID
-			WHERE p.GameID = session
-				
-			
-			*/
-			$sql = "CALL dasher_review()";
+			$sql = "SELECT p.PlayerID, p.PlayerName, a.AnswerID, a.AnswerText, a.BindAnswerID";
+			$sql .= " FROM players p INNER JOIN lobby l ON l.lobbyID = p.LobbyID";
+			$sql .= " LEFT JOIN answers a ON p.PlayerID = a.PlayerID AND l.GameID = a.GameID";
+			$sql .= " WHERE l.GameID =".$_SESSION['Game_ID']." ORDER BY p.OrderVal";
 			if(!$result = mysqli_query($con, $sql)){
 				echo('Cant find code for this lobby');
 			}
+			echo '<div class="container">';
+			echo '<table class="table table-striped table-bordered table-condensed"><tbody>';
 			while($row = mysqli_fetch_row($result)){
-				// 0-  1-  2-  
-				$gamestate = $row[0];
+				if(is_null($row[2])){
+					//this player hasn't submitted their answer yet
+					
+				} else {
+					//An answer has been submitted
+					if(is_null($row[4])){
+						//This answer is active and will be visible to players
+						
+					} else { 
+						//This answer will be hidden from voting	
+					}
+				}
 			}
-			
+			echo '</tbody></table></div>';
+			echo '<div id="footer" class="text-center"><button type="button" class="btn btn-info" onclick="launchVote()">Begin Voting</button></div>';
 		} else {
 			//look up the game state
 			$gamestate = "";
