@@ -47,10 +47,16 @@ if(isset($_SESSION['Host'])){
 		echo('Unable to sync Game to Lobby');
 	}
 	
+	//pull players who didn't check in recently out of the lobby/game
+	$sql = "UPDATE players SET LobbyID=NULL WHERE LastCheck <= NOW() - INTERVAL 15 SECOND AND LobbyID=".$_SESSION['Lobby_ID'];
+	if(!mysqli_query($con, $sql)){
+		echo('Unable to remove idle players');
+	}
+	
 	//set a random order for player names/answers/scores to appear for this game
 	$sql = "UPDATE players SET OrderVal=RAND() WHERE LobbyID=".$_SESSION['Lobby_ID'];
 	if(!mysqli_query($con, $sql)){
-		echo('Unable to sync Game to Lobby');
+		echo('Unable to randomize player order');
 	}
 }
 
