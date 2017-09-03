@@ -36,6 +36,37 @@ switch ($action_type){
 				}	
 			}
 			
+			//pull all the players in this game, and show their answers if they have been submitted
+			/*
+			SELECT p.PlayerID, p.PlayerName, a.AnswerText, a.BindAnswerID, AnswerID
+			FROM players p, answers a
+			WHERE p.GameID = session_gameid
+			AND a.GameID = session_gameid
+			AND p.PlayerID = a.PlayerID
+			
+			SELECT p.PlayerID, p.PlayerName, NULL, NULL, NULL
+			FROM players p
+			WHERE NOT EXISTS (
+				SELECT * FROM answers
+				WHERE  
+			)
+			SELECT *
+			FROM players p
+			LEFT JOIN answers a
+			ON p.PlayerID = a.PlayerID AND p.GameID = a.GameID
+			WHERE p.GameID = session
+				
+			
+			*/
+			$sql = "CALL dasher_review()";
+			if(!$result = mysqli_query($con, $sql)){
+				echo('Cant find code for this lobby');
+			}
+			while($row = mysqli_fetch_row($result)){
+				// 0-  1-  2-  
+				$gamestate = $row[0];
+			}
+			
 		} else {
 			//look up the game state
 			$gamestate = "";
