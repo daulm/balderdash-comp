@@ -230,8 +230,6 @@ function launchVote(){
 function showReview(){
 	/* this function waits a few seconds and then refreshes the data in the review screen and then calls itself again
 	it looks for a data attribute in the html to see if it is time to kick off voting. */
-	
-	
 	var myreq = $.get("review.php?mode=update", function(result){
 		if (refresh_review){		
 			$("#bd_content").html(result);
@@ -247,6 +245,11 @@ function showReview(){
 		}
 	});
 		
+}
+	
+function bindAnswer(){
+	//this function hides one answer behind another because they are too similar	
+	
 }
 	
 function submitAnswer(check){
