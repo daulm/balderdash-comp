@@ -19,13 +19,22 @@ $action_type = $_GET['mode'];
 switch ($action_type){
 	case "submit":
 		// Add the answer
-		$sql = "INSERT INTO answer (Code, HostID, SpyCount, TimeLimit) VALUES ('".$code."', ".$_SESSION['Player_ID'].", 1, 5)";
+		$sql = "INSERT INTO answers (GameID, PlayerID, AnswerText) VALUES (";
+		$sql .= $_SESSION['GameID'].", ".$_SESSION['Player_ID'].", '".mysql_real_escape_string($_POST['ans'])."')";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to submit the answer');
 		}
 		break;
 	case "update":
-		if($_SESSION['Dasher']){
+		if(isset($_SESSION['Dasher'])){
+			if(isset($_POST['hideans'])){
+				//the dasher wants to hide a similar answer behind another
+				$sql = "UPDATE answers SET BindAnswerID=".mysql_real_escape_string($_POST['bindans']);
+				$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['hideans']);
+				if(!mysqli_query($con, $sql)){
+					echo('Unable to sync Game to Lobby');
+				}	
+			}
 			
 		} else {
 			//look up the game state
@@ -51,6 +60,6 @@ switch ($action_type){
 
 mysqli_close($con);
 ?>
-<div id="footer"><button onclick="mainMenu()">Leave the Game</button></div>
+
 </body>
 </html>
