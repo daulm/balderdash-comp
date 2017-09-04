@@ -25,6 +25,12 @@ switch ($action_type){
 			echo('Unable to submit the answer');
 		}
 		break;
+	case "bind":
+		
+		break;
+	case "unbind":
+		
+		break;
 	case "update":
 		if(isset($_SESSION['Dasher'])){
 			if(isset($_POST['hideans'])){
@@ -49,14 +55,39 @@ switch ($action_type){
 			while($row = mysqli_fetch_row($result)){
 				if(is_null($row[2])){
 					//this player hasn't submitted their answer yet
-					
+					?>
+					<tr>
+						<td style="width: 150px"><b><?php echo htmlspecialchars($row[1]) ?></b></td>
+        					<td>- Waiting for Answer -</td>
+        					<td style="width: 150px"></td>
+      					</tr>
+					<?php
 				} else {
 					//An answer has been submitted
 					if(is_null($row[4])){
 						//This answer is active and will be visible to players
-						
+						?>
+						<tr id="<?php echo htmlspecialchars($row[2]) ?>">
+							<td style="width: 150px"><b><?php echo htmlspecialchars($row[1]) ?></b></td>
+        						<td><?php htmlspecialchars($row[3]) ?></td>
+        						<td style="width: 150px">
+							<button type="button" class="btn btn-danger myhide" onclick="hide(<?php htmlspecialchars($row[2]) ?>)">Hide from Voting</button>
+							<button type="button" class="btn btn-danger myundo" onclick="undoHide()" style="display: none;">Undo</button>
+							<button type="button" class="btn btn-info mybind" onclick="bind(<?php htmlspecialchars($row[2]) ?>)" style="display: none;">Bind to this</button>
+							</td>
+      						</tr>
+						<?php							
 					} else { 
-						//This answer will be hidden from voting	
+						//This answer will be hidden from voting
+						?>
+						<tr class="danger">
+							<td style="width: 150px"><b><?php echo htmlspecialchars($row[1]) ?></b></td>
+        						<td><?php htmlspecialchars($row[3]) ?></td>
+        						<td style="width: 150px">
+							<button type="button" class="btn btn-info" onclick="unhide(<?php htmlspecialchars($row[2]) ?>)">Unhide</button>
+							</td>
+      						</tr>
+						<?php						
 					}
 				}
 			}
