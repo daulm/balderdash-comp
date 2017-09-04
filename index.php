@@ -18,6 +18,7 @@ var mytimer;
 // The rate in milliseconds at which the lobby refreshes
 var refresh_speed = 1000;
 var $dasherid = 0;
+var $hideansid = 0;
 
 $(document).ready(function(){
 	initialise();
@@ -247,9 +248,40 @@ function showReview(){
 		
 }
 	
-function bindAnswer(){
-	//this function hides one answer behind another because they are too similar	
+function hide(ansid){
+	// this function marks an answer to be hidden
+	refresh_review = false;
+	$hideansid = ansid;
 	
+	
+}
+	
+function undoHide(){
+	// undo the change made when the dasher picked an answer to hide
+	refresh_review = true;
+	$hideansid = 0;
+	$(".myhide").show();
+	$(".myundo,.mybind").hide();	
+}
+	
+function unhide(ansid){
+	//This function removes the hidden state of the selected answer
+	var posting = $.post("review.php?mode=unbind", {ansid: ansid}, function(result){
+		
+	});
+	refresh_review = true;
+	showReview();
+}
+	
+function bind(bindansid){
+	//this function hides one answer behind another because they are too similar	
+	// it is only called after hide()
+	var posting = $.post("review.php?mode=bind", {hideansid: $hideansid, bindansid: bindansid}, function(result){
+		
+	});
+	refresh_review = true;
+	showReview();
+}
 }
 	
 function submitAnswer(check){
