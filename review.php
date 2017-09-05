@@ -47,7 +47,7 @@ switch ($action_type){
 				$sql = "UPDATE answers SET BindAnswerID=".mysql_real_escape_string($_POST['bindansid']);
 				$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['hideansid']);
 				if(!mysqli_query($con, $sql)){
-					echo('Unable to sync Game to Lobby');
+					echo('Unable to bind answers');
 				}	
 			}
 			
@@ -59,6 +59,7 @@ switch ($action_type){
 			if(!$result = mysqli_query($con, $sql)){
 				echo('Cant find code for this lobby');
 			}
+			echo '<span id="msglist" data-gamestate="review"></span>';
 			echo '<div class="container">';
 			echo '<table class="table table-striped table-bordered table-condensed"><tbody>';
 			while($row = mysqli_fetch_row($result)){
