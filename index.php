@@ -166,6 +166,7 @@ function returnLobby(){
 		$("#bd_content").html(result);
 	});
 	refresh_lobby = true;
+	$voterun = false;
 	setTimeout(showLobby, refresh_speed);
 }
 	
