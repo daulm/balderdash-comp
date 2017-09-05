@@ -26,17 +26,26 @@ switch ($action_type){
 		}
 		break;
 	case "bind":
-		
+		/*
+		$sql = "UPDATE answers SET BindAnswerID=0";
+		$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['ansid']);
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to sync Game to Lobby');
+		}*/
 		break;
 	case "unbind":
-		
+		$sql = "UPDATE answers SET BindAnswerID=0";
+		$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['ansid']);
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to sync Game to Lobby');
+		}
 		break;
 	case "update":
 		if(isset($_SESSION['Dasher'])){
-			if(isset($_POST['hideans'])){
+			if(isset($_POST['hideansid'])){
 				//the dasher wants to hide a similar answer behind another
-				$sql = "UPDATE answers SET BindAnswerID=".mysql_real_escape_string($_POST['bindans']);
-				$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['hideans']);
+				$sql = "UPDATE answers SET BindAnswerID=".mysql_real_escape_string($_POST['bindansid']);
+				$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['hideansid']);
 				if(!mysqli_query($con, $sql)){
 					echo('Unable to sync Game to Lobby');
 				}	
