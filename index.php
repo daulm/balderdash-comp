@@ -122,7 +122,7 @@ function lobbySettings(){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
-	setTimeout(showLobby, refresh_speed);
+	//setTimeout(showLobby, refresh_speed);
 }
 	
 function updateClue(){
@@ -132,7 +132,7 @@ function updateClue(){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
-	setTimeout(showLobby, refresh_speed);	
+	//setTimeout(showLobby, refresh_speed);	
 }
 	
 function updateDasher($dasherid){
@@ -141,7 +141,7 @@ function updateDasher($dasherid){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
-	setTimeout(showLobby, refresh_speed);	
+	//setTimeout(showLobby, refresh_speed);	
 }
 
 function updateDasherScore(){
@@ -151,7 +151,7 @@ function updateDasherScore(){
 		$('#bd_content').html(result);
 	});
 	refresh_lobby = true;
-	setTimeout(showLobby, refresh_speed);	
+	//setTimeout(showLobby, refresh_speed);	
 }	
 	
 function stopRefresh(){
@@ -276,12 +276,11 @@ function unhide(ansid){
 function bind(bindansid){
 	//this function hides one answer behind another because they are too similar	
 	// it is only called after hide()
-	var posting = $.post("review.php?mode=bind", {hideansid: $hideansid, bindansid: bindansid}, function(result){
+	var posting = $.post("review.php?mode=update", {hideansid: $hideansid, bindansid: bindansid}, function(result){
 		
 	});
 	refresh_review = true;
-	showReview();
-}
+	setTimeout(showReview, refresh_speed);
 }
 	
 function submitAnswer(check){
