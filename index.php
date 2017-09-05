@@ -19,6 +19,7 @@ var mytimer;
 var refresh_speed = 1000;
 var $dasherid = 0;
 var $hideansid = 0;
+var $voterun = false;
 
 $(document).ready(function(){
 	initialise();
@@ -67,8 +68,8 @@ function showLobby(){
 	
 	myreq.done(function(){
 		initialise();
-		if ($("#msglist").data("gamestate") > 0){
-			launchGame($("#msglist").data("gamestate"));
+		if ($("#msglist").data("gamestate") == "answer"){
+			launchGame();
 		} else {
 			setTimeout(showLobby, refresh_speed);
 		}
@@ -178,6 +179,10 @@ function timeUp(){
 			//if it is voting submit nothing and move on to the results
 			refresh_results = true;
 			setTimeout(showResults, refresh_speed);
+		case "results":
+			//if voting just completed submit nothing and move on to the results
+			refresh_results = true;
+			setTimeout(showResults, refresh_speed);
 		default:
 			//if it is anything else, do nothin
 			
@@ -215,17 +220,20 @@ function launchGame(){
 	});
 }
 	
-function launchVote(){
+function launchVote(num){
 	// kick off the vote menu
 	refresh_review = false;
 	var myreq = $.get("vote.php", function(result){
 		$("#bd_content").html(result);
 	});
-
+	
 	myreq.done(function(){
 		var timeleft = $("#countdown").data("timeleft");
 		startTimer(timeleft, $("#countdown"));
-	});	
+	});
+	if (num>0){
+		$voterun = true;
+	}
 }
 	
 function showReview(){
@@ -240,7 +248,9 @@ function showReview(){
 	myreq.done(function(){
 			
 		if ($("#msglist").data("gamestate") == "vote"){
-			launchVote();
+			if(!$voterun){
+				launchVote(0);
+			}
 		} else {
 			setTimeout(showReview, refresh_speed);
 		}
@@ -295,6 +305,7 @@ function submitAnswer(check){
 	var posting = $.post("review.php?mode=submit", {ans: ans}, function(result){
 		$("#bd_content").html(result);
 	});
+	clearInterval(mytimer);
 	refresh_review = true;
 	setTimeout(showReview, refresh_speed);
 }
@@ -328,6 +339,7 @@ function submitVote(){
 	var posting = $.post("results.php?mode=submit", {voteid: vote}, function(result){
 		$("#bd_content").html(result);
 	});
+	clearInterval(mytimer);
 	refresh_results = true;
 	setTimeout(showResults, refresh_speed);
 }	
