@@ -76,7 +76,7 @@ mysqli_close($con);
 <div class="container">
 	<div class="well well-sm">
 		<div class="col-xs-9"><?php echo htmlspecialchars($clue) ?></div>
-	  	<div class="col-xs-3">Time Left: <span id="countdown" data-timeleft="<?php htmlspecialchars($timeleft) ?>"></span></div>
+	  	<div class="col-xs-3">Time Left: <span id="countdown" data-timeleft="<?php echo htmlspecialchars($timeleft) ?>"></span></div>
   	</div>
 	
     	<div class="input-group">
