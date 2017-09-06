@@ -49,7 +49,15 @@ if(isset($_SESSION['Dasher'])){
 		}
 		while($row = mysqli_fetch_row($result)){
 			//Show the Answer Text and voting button
-			
+			?>
+			<div class="container">
+    				<div class="input-group panel panel-success">
+      		 		<div class="panel-body"><?php echo $row[0] ?></div>
+        			<span class="input-group-addon btn btn-success" type="button" onclick="preVote()">Select</span>
+				<span class="input-group-addon btn btn-primary" type="button" onclick="submitVote(<?php echo $row[1] ?>)" style="display: none;">Vote</span>
+    				</div>
+     			</div>
+			<?php
 		}
 	} else {
 		// We found a vote from this player for this game, no more voting
