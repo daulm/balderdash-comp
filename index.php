@@ -176,14 +176,17 @@ function timeUp(){
 		case "answer":
 			//if it is an answer submission submit whatever they have completed
 			submitAnswer(false);
+			break;
 		case "vote":
 			//if it is voting submit nothing and move on to the results
 			refresh_results = true;
 			setTimeout(showResults, refresh_speed);
+			break;
 		case "results":
 			//if voting just completed submit nothing and move on to the results
 			refresh_results = true;
 			setTimeout(showResults, refresh_speed);
+			break;
 		default:
 			//if it is anything else, do nothin
 			
@@ -334,16 +337,27 @@ function showResults(){
 }
 	
 function preVote(){
-	
+	$(".btn-primary").hide();
+        $(".btn-success").show();
+        $(elem).prev().prev().show();
+        $(elem).hide();
+        $(".panel").removeClass("panel-primary");
+        $(".panel").addClass("panel-success");
+        $(elem).closest("div").removeClass("panel-success");
+        $(elem).closest("div").addClass("panel-primary");	
 }
 	
 function submitVote(ansid){
 	// this function submits the vote
-	var vote = $("#voteid").val();
-
-	var posting = $.post("results.php?mode=submit", {ansid: ansid}, function(result){
-		$("#bd_content").html(result);
-	});
+	if(ansid == 0){
+		var posting = $.get("results.php?mode=skip", function(result){
+			$("#bd_content").html(result);
+		});
+	} else {
+		var posting = $.post("results.php?mode=submit", {ansid: ansid}, function(result){
+			$("#bd_content").html(result);
+		});
+	}
 	clearInterval(mytimer);
 	refresh_results = true;
 	setTimeout(showResults, refresh_speed);
