@@ -27,7 +27,7 @@ if(isset($_SESSION['Dasher'])){
 	$sql .= " WHERE GameID = (SELECT l.GameID FROM lobby l";
 	$sql .= " WHERE l.LobbyID =".$_SESSION['Lobby_ID'].")";
 	if(!mysqli_query($con, $sql)){
-		echo('Unable update the gamestate');
+		echo('Unable update the voting begin time');
 	}
 	echo '<div class="alert alert-info">';
 	echo '<strong>No need to vote</strong> Just click the button below and wait for the voting to finish.</div>';
@@ -41,11 +41,11 @@ if(isset($_SESSION['Dasher'])){
 	}
 	if(mysqli_num_rows($result) == 0){
 		//Look up all the available options 
-		$sql = "SELECT a.AnswerText, a.AnswerID FROM answers a, lobby l";
+		$sql = "SELECT a.AnswerText, a.AnswerID FROM answers a, lobby l, players p";
 		$sql .= " WHERE l.GameID = a.GameID AND a.BindAnswerID = 0 AND l.LobbyID=".$_SESSION['Lobby_ID'];
-		$sql .= " AND a.PlayerID !=".$_SESSION['Player_ID'];
+		$sql .= " AND p.PlayerID = a.PlayerID AND a.PlayerID !=".$_SESSION['Player_ID']." ORDER BY p.OrderVal";
 		if(!$result = mysqli_query($con, $sql)){
-			echo('Unable check if I voted');
+			echo('Unable find voting options');
 		}
 		while($row = mysqli_fetch_row($result)){
 			//Show the Answer Text and voting button
