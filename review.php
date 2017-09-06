@@ -79,11 +79,11 @@ switch ($action_type){
 						?>
 						<tr id="<?php echo htmlspecialchars($row[2]) ?>">
 							<td style="width: 150px"><b><?php echo htmlspecialchars($row[1]) ?></b></td>
-        						<td><?php htmlspecialchars($row[3]) ?></td>
+        						<td><?php echo htmlspecialchars($row[3]) ?></td>
         						<td style="width: 150px">
-							<button type="button" class="btn btn-danger myhide" onclick="hide(<?php htmlspecialchars($row[2]) ?>)">Hide from Voting</button>
+							<button type="button" class="btn btn-danger myhide" onclick="hide(<?php echo htmlspecialchars($row[2]) ?>)">Hide from Voting</button>
 							<button type="button" class="btn btn-danger myundo" onclick="undoHide()" style="display: none;">Undo</button>
-							<button type="button" class="btn btn-info mybind" onclick="bind(<?php htmlspecialchars($row[2]) ?>)" style="display: none;">Bind to this</button>
+							<button type="button" class="btn btn-info mybind" onclick="bind(<?php echo htmlspecialchars($row[2]) ?>)" style="display: none;">Bind to this</button>
 							</td>
       						</tr>
 						<?php							
@@ -92,9 +92,9 @@ switch ($action_type){
 						?>
 						<tr class="danger">
 							<td style="width: 150px"><b><?php echo htmlspecialchars($row[1]) ?></b></td>
-        						<td><?php htmlspecialchars($row[3]) ?></td>
+        						<td><?php echo htmlspecialchars($row[3]) ?></td>
         						<td style="width: 150px">
-							<button type="button" class="btn btn-info" onclick="unhide(<?php htmlspecialchars($row[2]) ?>)">Unhide</button>
+							<button type="button" class="btn btn-info" onclick="unhide(<?php echo htmlspecialchars($row[2]) ?>)">Unhide</button>
 							</td>
       						</tr>
 						<?php						
