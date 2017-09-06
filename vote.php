@@ -52,9 +52,9 @@ if(isset($_SESSION['Dasher'])){
 			?>
 			<div class="container">
     				<div class="input-group panel panel-success">
+				<span class="input-group-addon btn btn-primary" type="button" onclick="submitVote(<?php echo $row[1] ?>)" style="display: none;">Vote</span>
       		 		<div class="panel-body"><?php echo $row[0] ?></div>
         			<span class="input-group-addon btn btn-success" type="button" onclick="preVote()">Select</span>
-				<span class="input-group-addon btn btn-primary" type="button" onclick="submitVote(<?php echo $row[1] ?>)" style="display: none;">Vote</span>
     				</div>
      			</div>
 			<?php
@@ -70,7 +70,11 @@ if(isset($_SESSION['Dasher'])){
 mysqli_close($con);
 ?>
 <br>
-<div id="footer" class="text-center"><button type="button" class="btn btn-info" onclick="skipVote()">Skip voting and wait for results</button></div>
+<div id="footer" class="container text-center">
+	<div class="col-xs-6">Time Left: <span id="countdown" data-timeleft="<?php echo htmlspecialchars($timeleft) ?>"></span></div>
+	<div class="col-xs-6"><button type="button" class="btn btn-info" onclick="submitVote(0)">Skip voting and wait for results</button></div>
+	
+</div>
 
 </body>
 </html>
