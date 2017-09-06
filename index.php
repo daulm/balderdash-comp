@@ -333,11 +333,15 @@ function showResults(){
 		
 }
 	
-function submitVote(){
+function preVote(){
+	
+}
+	
+function submitVote(ansid){
 	// this function submits the vote
 	var vote = $("#voteid").val();
 
-	var posting = $.post("results.php?mode=submit", {voteid: vote}, function(result){
+	var posting = $.post("results.php?mode=submit", {ansid: ansid}, function(result){
 		$("#bd_content").html(result);
 	});
 	clearInterval(mytimer);
