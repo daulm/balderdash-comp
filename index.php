@@ -263,11 +263,16 @@ function showReview(){
 }
 	
 function hide(ansid){
-	// this function marks an answer to be hidden
+	// this function marks an answer to be hidden, it switches around which buttons are visible on each row
+	// and it changes the highlighting of the selected row
 	refresh_review = false;
 	$hideansid = ansid;
-	
-	
+	$(".mybind").show();
+	$(".myhide").hide();
+	$("#"+ansid+" .mybind").hide();
+	$("#"+ansid+" .myhide").hide();
+	$("#"+ansid+" .myundo").show();
+        $("#"+ansid).addClass("info");	
 }
 	
 function undoHide(){
@@ -275,7 +280,8 @@ function undoHide(){
 	refresh_review = true;
 	$hideansid = 0;
 	$(".myhide").show();
-	$(".myundo,.mybind").hide();	
+	$(".myundo,.mybind").hide();
+	$(".info").removeClass("info");
 }
 	
 function unhide(ansid){
