@@ -10,7 +10,7 @@ session_start();
 if (!isset($_SESSION['Player_ID'])){
 	die('Session lost, please reload the app.');
 }
-$con = mysqli_connect($db_host, $db_username, $db_pw, 'spyfall');
+$con = mysqli_connect($db_host, $db_username, $db_pw, 'balderdash');
 if (!$con){
 	die('DB connection failed: '.mysqli_error($con));
 }
@@ -65,7 +65,12 @@ if(isset($_SESSION['Dasher'])){
 		echo '<strong>Looks like you already voted</strong> Just click the button below and wait for the voting to finish.</div>';
 	}
 }
-
+$sql = "SELECT VoteTime FROM lobby WHERE LobbyID=".$_SESSION['Lobby_ID'];
+if(!$result = mysqli_query($con, $sql)){
+	echo('Unable to find time limit');
+}
+$row = mysqli_fetch_row($result);
+$timeleft = $row[0];
 
 mysqli_close($con);
 ?>

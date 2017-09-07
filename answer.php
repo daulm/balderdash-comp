@@ -31,7 +31,7 @@ while($row = mysqli_fetch_row($result)){
 if(isset($_SESSION['Host'])){
 	//create new game 
 	$sql = "INSERT INTO games (LobbyID, Clue, DasherID) VALUES (";
-	$sql .= $_SESSION['Lobby_ID'].", '".$clue."', ".$dasherid.")";
+	$sql .= $_SESSION['Lobby_ID'].", '".mysql_real_escape_string($clue)."', ".$dasherid.")";
 	if(!mysqli_query($con, $sql)){
 		echo('Unable to create Game');
 	}
@@ -74,9 +74,9 @@ mysqli_close($con);
 ?>
   
 <div class="container">
-	<div class="well well-sm">
-		<div class="col-xs-9"><?php echo htmlspecialchars($clue) ?></div>
-	  	<div class="col-xs-3">Time Left: <span id="countdown" data-timeleft="<?php echo htmlspecialchars($timeleft) ?>"></span></div>
+	<div class="row well well-sm">
+		<div class="col-xs-8"><?php echo htmlspecialchars($clue) ?></div>
+	  	<div class="col-xs-4">Time Left: <span id="countdown" data-timeleft="<?php echo htmlspecialchars($timeleft) ?>"></span></div>
   	</div>
 	
     	<div class="input-group">
@@ -84,6 +84,7 @@ mysqli_close($con);
         	<span class="input-group-addon btn btn-primary" type="button" onclick="submitAnswer(1)">Submit</span>
     	</div>
 </div>	
+<span id="msglist" data-gamestate="answer"></span>
 	
 </body>
 </html>
