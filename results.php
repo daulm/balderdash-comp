@@ -19,10 +19,17 @@ $action_type = $_GET['mode'];
 switch ($action_type){
 	case "skip":
 		//The user did not submit a vote insert a blank vote anyway
-		
+		$sql = "INSERT INTO votes (AnswerID, PlayerID) VALUES (0, ".$_SESSION['Player_ID'].")";
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to save decision');
+		}
 		break;
 	case "submit":
-		
+		$sql = "INSERT INTO votes (AnswerID, PlayerID) VALUES (";
+		$sql .= $_POST['ansid'].", ".$_SESSION['Player_ID'].")";
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to save vote');
+		}		
 		break;
 	case "endvote":
 		$donevote = TRUE;
@@ -112,6 +119,7 @@ if(isset($_SESSION['Dasher'])){
 	}
 	if(mysqli_num_rows($result) == 0){
 		//People are still voting
+		echo '<div class="container alert alert-danger"> Please wait for players to complete voting</div>';
 		
 	} else {
 		$donevote = TRUE;
@@ -120,41 +128,41 @@ if(isset($_SESSION['Dasher'])){
 	
 if($donevote){
 
-		//pull all answers and their votes
-		$sql = "SELECT a.AnswerID, a.AnswerText, p.PlayerName, p.PlayerID, p.Score, vp.PlayerName, vp.PlayerID";
-		$sql .= " FROM answers a, players p, players vp LEFT JOIN votes v ON v.AnswerID = a.AnswerID";
-		$sql .= " WHERE a.PlayerID = p.PlayerID AND a.GameID=".$_SESSION['Game_ID'];
-		$sql .= " AND vp.PlayerID = v.PlayerID";
-		$sql .= " ORDER BY ISNULL(vp.PlayerName), a.AnswerID"; 
-		if(!$result = mysqli_query($con, $sql)){
-			echo('Cant find list of answers/votes.');
-		}
-		$previd = 0;
-		echo '<div><div>';  //these divs won't contain anything, but each new row <div> must close out last row
-		while($row = mysqli_fetch_row($result)){
-			// 0-ansid 1-anstxt 2-name 3-playerid 4-score 5-votername 6-voterid
-			if($previd == $row[0]){
-				// we already created the table row, just add the new voter
-				echo '<div class="row"><span class="label label-'.$rstyle.'">'.$row[5].'</span></div>';
-			} else {
-				$rstyle = "active";
-				if($row[3] == $_SESSION['Player_ID']){
-					//this is the correct answer
-					$rstyle = "success";
-				}
-				if(!is_null($row[5])){
-					//this answer got votes	
-					$rstyle = "info";
-				}
-				echo '</div></div><div class="row">';
-				echo '	<div class="col-xs-3 text-center alert alert-'.$rstyle.'">'.$row[2].'<span class="badge">'.$row[4].'</span></div>';
-				echo '	<div class="col-xs-6 alert alert-'.$rstyle.'">'.$row[1].'</div>';
-				echo '	<div class="col-xs-3"><div class="row"><span class="label label-'.$rstyle.'">'.$row[5].'</span></div>';
-				$previd = $row[0];
+	//pull all answers and their votes
+	$sql = "SELECT a.AnswerID, a.AnswerText, p.PlayerName, p.PlayerID, p.Score, vp.PlayerName, vp.PlayerID";
+	$sql .= " FROM answers a, players p, players vp LEFT JOIN votes v ON v.AnswerID = a.AnswerID";
+	$sql .= " WHERE a.PlayerID = p.PlayerID AND a.GameID=".$_SESSION['Game_ID'];
+	$sql .= " AND vp.PlayerID = v.PlayerID";
+	$sql .= " ORDER BY ISNULL(vp.PlayerName), a.AnswerID"; 
+	if(!$result = mysqli_query($con, $sql)){
+		echo('Cant find list of answers/votes.');
+	}
+	$previd = 0;
+	echo '<div><div>';  //these divs won't contain anything, but each new row <div> must close out last row
+	while($row = mysqli_fetch_row($result)){
+		// 0-ansid 1-anstxt 2-name 3-playerid 4-score 5-votername 6-voterid
+		if($previd == $row[0]){
+			// we already created the table row, just add the new voter
+			echo '<div class="row"><span class="label label-'.$rstyle.'">'.$row[5].'</span></div>';
+		} else {
+			$rstyle = "active";
+			if($row[3] == $_SESSION['Player_ID']){
+				//this is the correct answer
+				$rstyle = "success";
 			}
-			
+			if(!is_null($row[5])){
+				//this answer got votes	
+				$rstyle = "info";
+			}
+			echo '</div></div><div class="row">';
+			echo '	<div class="col-xs-3 text-center alert alert-'.$rstyle.'">'.$row[2].'<span class="badge">'.$row[4].'</span></div>';
+			echo '	<div class="col-xs-6 alert alert-'.$rstyle.'">'.$row[1].'</div>';
+			echo '	<div class="col-xs-3"><div class="row"><span class="label label-'.$rstyle.'">'.$row[5].'</span></div>';
+			$previd = $row[0];
 		}
-		echo '</div></div>';
+
+	}
+	echo '</div></div>';
 }
 
 
