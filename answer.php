@@ -29,39 +29,46 @@ while($row = mysqli_fetch_row($result)){
 
 //if host, set up new game and change game state of lobby
 if(isset($_SESSION['Host'])){
-	//create new game 
-	$sql = "INSERT INTO games (LobbyID, Clue, DasherID) VALUES (";
-	$sql .= $_SESSION['Lobby_ID'].", '".mysql_real_escape_string($clue)."', ".$dasherid.")";
-	if(!mysqli_query($con, $sql)){
-		echo('Unable to create Game');
-	}
-	$sql = "SELECT MAX(GameID) FROM games";
+	//check if the game was already created
+	$sql = "SELECT * FROM Lobby WHERE GameState='answer' AND LobbyID=".$_SESSION['Lobby_ID'];
 	if(!$result = mysqli_query($con, $sql)){
-		echo('Unable to find newest Game');
+		echo('Unable to check if we already created game');
 	}
-	$row = mysqli_fetch_row($result);
-	$_SESSION['Game_ID'] = $row[0];
-	
-	$sql = "UPDATE lobby SET GameID=".$_SESSION['Game_ID'].", GameState='answer' WHERE LobbyID=".$_SESSION['Lobby_ID'];
-	if(!mysqli_query($con, $sql)){
-		echo('Unable to sync Game to Lobby');
-	}
-	
-	//pull players who didn't check in recently out of the lobby/game
-	$sql = "UPDATE players SET LobbyID=NULL WHERE LastCheck <= NOW() - INTERVAL 15 SECOND AND LobbyID=".$_SESSION['Lobby_ID'];
-	if(!mysqli_query($con, $sql)){
-		echo('Unable to remove idle players');
-	}
-	
-	//set a random order for player names/answers/scores to appear for this game
-	$sql = "UPDATE players SET OrderVal=RAND() WHERE LobbyID=".$_SESSION['Lobby_ID'];
-	if(!mysqli_query($con, $sql)){
-		echo('Unable to randomize player order');
+	if(mysqli_num_rows($result) == 0){
+		//create new game 
+		$sql = "INSERT INTO games (LobbyID, Clue, DasherID) VALUES (";
+		$sql .= $_SESSION['Lobby_ID'].", '".mysql_real_escape_string($clue)."', ".$dasherid.")";
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to create Game');
+		}
+		$sql = "SELECT MAX(GameID) FROM games";
+		if(!$result = mysqli_query($con, $sql)){
+			echo('Unable to find newest Game');
+		}
+		$row = mysqli_fetch_row($result);
+		$_SESSION['Game_ID'] = $row[0];
+		
+		$sql = "UPDATE lobby SET GameID=".$_SESSION['Game_ID'].", GameState='answer' WHERE LobbyID=".$_SESSION['Lobby_ID'];
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to sync Game to Lobby');
+		}
+		
+		//pull players who didn't check in recently out of the lobby/game
+		$sql = "UPDATE players SET LobbyID=NULL WHERE LastCheck <= (NOW() - INTERVAL 15 SECOND) AND LobbyID=".$_SESSION['Lobby_ID'];
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to remove idle players');
+		}
+		
+		//set a random order for player names/answers/scores to appear for this game
+		$sql = "UPDATE players SET OrderVal=RAND() WHERE LobbyID=".$_SESSION['Lobby_ID'];
+		if(!mysqli_query($con, $sql)){
+			echo('Unable to randomize player order');
+		}
 	}
 }
 
 //set the gameid to the session
-$sql = "SELECT GameID FROM lobby";
+$sql = "SELECT MAX(GameID) FROM lobby";
 $sql .= " WHERE LobbyID=".$_SESSION['Lobby_ID'];
 if(!$result = mysqli_query($con, $sql)){
 	echo('Cant find code for this lobby');

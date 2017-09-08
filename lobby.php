@@ -64,7 +64,7 @@ switch ($action_type){
 		break;
 	case "join":
 		// check that the code is correct and the lobby was created in the past 24 hours
-		$sql = "SELECT LobbyID FROM lobby WHERE Code=UPPER('".mysql_real_escape_string($_POST['code'])."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+		$sql = "SELECT MAX(LobbyID) FROM lobby WHERE Code=UPPER('".mysql_real_escape_string($_POST['code'])."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
 		if(!$result = mysqli_query($con, $sql)){
 			echo('Cant find a Lobby with the given code.');
 		}		

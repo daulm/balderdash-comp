@@ -33,9 +33,9 @@ if(isset($_SESSION['Dasher'])){
 	echo '<strong>No need to vote</strong> Just click the button below and wait for the voting to finish.</div>';
 } else {
 	//look to see if they have already voted
-	$sql = "SELECT v.VoteID FROM votes v, lobby l";
+	$sql = "SELECT v.VoteID FROM votes v, lobby l, answers a";
 	$sql .= " WHERE v.PlayerID=".mysql_real_escape_string($_SESSION['Player_ID']);
-	$sql .= " AND v.GameID = l.GameID AND l.LobbyID =".$_SESSION['Lobby_ID'];
+	$sql .= " AND a.GameID = l.GameID AND v.AnswerID = a.AnswerID AND l.LobbyID =".$_SESSION['Lobby_ID'];
 	if(!$result = mysqli_query($con, $sql)){
 		echo('Unable check if I voted');
 	}
@@ -70,7 +70,7 @@ if(!$result = mysqli_query($con, $sql)){
 	echo('Unable to find time limit');
 }
 $row = mysqli_fetch_row($result);
-$timeleft = $row[0];
+$timeleft = $row[0]*60;
 
 mysqli_close($con);
 ?>
