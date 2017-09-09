@@ -274,7 +274,7 @@ if(isset($_SESSION['Dasher'])){
 mysqli_close($con);
 ?>
 
-<div id="footer" class="text-center"><button type="button" class="btn btn-warning" onclick="mainMenu()">Return to Main</button></div>
+<div id="footer" class="text-center"><button type="button" class="btn btn-warning" onclick="mainMenu(1)">Return to Main</button></div>
 
 
 </body>
