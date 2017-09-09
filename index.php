@@ -47,10 +47,10 @@ $('.clicky').click(function() {
 
 }
 	
-function mainMenu(){
+function mainMenu(mode){
 	// this function loads the main menu of the game
 	refresh_lobby = false;
-	$.get("main_menu.php", function(result){
+	$.get("main_menu.php?mode="+mode, function(result){
 		$("#bd_content").html(result);
 	});
 }
