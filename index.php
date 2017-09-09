@@ -50,8 +50,30 @@ $('.clicky').click(function() {
 function mainMenu(mode){
 	// this function loads the main menu of the game
 	refresh_lobby = false;
-	$.get("main_menu.php?mode="+mode, function(result){
+	var myreq = $.get("main_menu.php?mode="+mode, function(result){
 		$("#bd_content").html(result);
+	});
+	myreq.done(function(){
+		switch($("#msglist").data("gamestate")){
+			case "lobby":
+				showLobby();
+				break;
+			case "answer":
+				launchGame();
+				break;
+			case "vote":
+				launchVote(0);
+				break;
+			case "results":
+				launchVote(0);
+				break;
+			case "complete":
+				showLobby();
+				break;
+			default:
+		
+		}
+		
 	});
 }
 
@@ -67,7 +89,7 @@ function showLobby(){
 	});
 	
 	myreq.done(function(){
-		initialise();
+		//initialise();
 		if ($("#msglist").data("gamestate") == "answer"){
 			launchGame();
 		} else {
@@ -88,6 +110,7 @@ function hostGame(){
 	var posting = $.post("lobby.php?mode=create", {pname: name}, function(result){
 		$("#bd_content").html(result);
 	});
+	initialise();
 	refresh_lobby = true;
 	setTimeout(showLobby, refresh_speed);
 }
@@ -107,6 +130,7 @@ function enterLobby(){
 	var posting = $.post("lobby.php?mode=join", {pname: name, code: code}, function(result){
 		$("#bd_content").html(result);
 	});
+	initialise();
 	refresh_lobby = true;
 	setTimeout(showLobby, refresh_speed);
 }
@@ -167,6 +191,7 @@ function returnLobby(){
 	});
 	refresh_lobby = true;
 	$voterun = false;
+	initialise();
 	setTimeout(showLobby, refresh_speed);
 }
 	
@@ -372,7 +397,7 @@ function submitVote(ansid){
 </script>
 </head>
 
-<body onload="mainMenu()">
+<body onload="mainMenu(0)">
 
 <div id="bd_content">Loading Balderdash Companion...</div>
 
