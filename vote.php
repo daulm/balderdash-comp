@@ -54,7 +54,7 @@ if(isset($_SESSION['Dasher'])){
     				<div class="input-group panel panel-success">
 				<span class="input-group-addon btn btn-primary" type="button" onclick="submitVote(<?php echo $row[1] ?>)" style="display: none;">Vote</span>
       		 		<div class="panel-body"><?php echo $row[0] ?></div>
-        			<span class="input-group-addon btn btn-success" type="button" onclick="preVote()">Select</span>
+        			<span class="input-group-addon btn btn-success" type="button" onclick="preVote(this)">Select</span>
     				</div>
      			</div>
 			<?php
@@ -72,6 +72,18 @@ if(!$result = mysqli_query($con, $sql)){
 $row = mysqli_fetch_row($result);
 $timeleft = $row[0]*60;
 
+//look up the game state
+$gamestate = "";
+$sql = "SELECT l.GameState FROM lobby l, players p";
+$sql .= " WHERE p.LobbyID = l.LobbyID AND p.PlayerID=".$_SESSION['Player_ID'];
+if(!$result = mysqli_query($con, $sql)){
+	echo('Cant find code for this lobby');
+}
+while($row = mysqli_fetch_row($result)){
+	$gamestate = $row[0];
+}
+echo '<span id="msglist" data-gamestate="'.$gamestate.'"></span>';
+
 mysqli_close($con);
 ?>
 <br>
@@ -80,6 +92,7 @@ mysqli_close($con);
 	<div class="col-xs-6"><button type="button" class="btn btn-info" onclick="submitVote(0)">Skip voting and wait for results</button></div>
 	
 </div>
+<div id="footer" class="container text-center"><button type="button" class="btn btn-warning" onclick="if(confirm('You want to Quit?')){mainMenu(1)}">Quit to Main</button></div>
 
 </body>
 </html>

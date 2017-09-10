@@ -56,7 +56,7 @@ function mainMenu(mode){
 	myreq.done(function(){
 		switch($("#msglist").data("gamestate")){
 			case "lobby":
-				showLobby();
+				returnLobby();
 				break;
 			case "answer":
 				launchGame();
@@ -68,7 +68,7 @@ function mainMenu(mode){
 				launchVote(0);
 				break;
 			case "complete":
-				showLobby();
+				returnLobby();
 				break;
 			default:
 		
@@ -89,10 +89,12 @@ function showLobby(){
 	});
 	
 	myreq.done(function(){
-		//initialise();
+		initialise();
 		if ($("#msglist").data("gamestate") == "answer"){
 			launchGame();
 		} else {
+			refresh_results = false;
+			refresh_review = false;
 			setTimeout(showLobby, refresh_speed);
 		}
 	});
@@ -189,6 +191,8 @@ function returnLobby(){
 	$.get("lobby.php?mode=return", function(result){
 		$("#bd_content").html(result);
 	});
+	refresh_results = false;
+	refresh_review = false;
 	refresh_lobby = true;
 	$voterun = false;
 	initialise();
@@ -204,13 +208,11 @@ function timeUp(){
 			break;
 		case "vote":
 			//if it is voting submit nothing and move on to the results
-			refresh_results = true;
-			setTimeout(showResults, refresh_speed);
+			submitVote(0);
 			break;
-		case "results":
+		case "complete":
 			//if voting just completed submit nothing and move on to the results
-			refresh_results = true;
-			setTimeout(showResults, refresh_speed);
+			submitVote(0);
 			break;
 		default:
 			//if it is anything else, do nothin
@@ -358,7 +360,7 @@ function showResults(){
 		
 	myreq.done(function(){
 			
-		if ($("#msglist").data("gamestate") != "results"){
+		if ($("#msglist").data("gamestate") == "complete"){
 			refresh_results = false;
 		} else {
 			setTimeout(showResults, refresh_speed);
@@ -367,15 +369,16 @@ function showResults(){
 		
 }
 	
-function preVote(){
+function preVote(elem){
+	
 	$(".btn-primary").hide();
-        $(".btn-success").show();
-        $(elem).prev().prev().show();
-        $(elem).hide();
-        $(".panel").removeClass("panel-primary");
-        $(".panel").addClass("panel-success");
-        $(elem).closest("div").removeClass("panel-success");
-        $(elem).closest("div").addClass("panel-primary");	
+    $(".btn-success").show();
+    $(elem).prev().prev().show();
+    $(elem).hide();
+    $(".panel").removeClass("panel-primary");
+    $(".panel").addClass("panel-success");
+    $(elem).closest("div").removeClass("panel-success");
+    $(elem).closest("div").addClass("panel-primary");	
 }
 	
 function submitVote(ansid){

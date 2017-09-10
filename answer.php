@@ -54,7 +54,7 @@ if(isset($_SESSION['Host'])){
 		}
 		
 		//pull players who didn't check in recently out of the lobby/game
-		$sql = "UPDATE players SET LobbyID=NULL WHERE LastCheck <= (NOW() - INTERVAL 15 SECOND) AND LobbyID=".$_SESSION['Lobby_ID'];
+		$sql = "UPDATE players SET LobbyID=NULL WHERE LastCheck <= (NOW() - INTERVAL 30 SECOND) AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to remove idle players');
 		}
@@ -92,6 +92,8 @@ mysqli_close($con);
     	</div>
 </div>	
 <span id="msglist" data-gamestate="answer"></span>
+
+<div id="footer" class="container text-center"><button type="button" class="btn btn-warning" onclick="if(confirm('You want to Quit?')){mainMenu(1)}">Quit to Main</button></div>
 	
 </body>
 </html>

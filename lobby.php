@@ -40,7 +40,7 @@ switch ($action_type){
 		}
 		// Create the lobby
 		$sql = "INSERT INTO lobby (Code, HostID, DasherID, AnswerTime, VoteTime)";
-		$sql .= " VALUES ('".$code."', ".$_SESSION['Player_ID'].", ".$_SESSION['Player_ID'].", 5, 5)";
+		$sql .= " VALUES ('".$code."', ".$_SESSION['Player_ID'].", ".$_SESSION['Player_ID'].", 2, 1)";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to create the lobby');
 		}
@@ -140,9 +140,16 @@ switch ($action_type){
 		}
 		break;
 	case "return":
-		$sql = "UPDATE lobby SET GameID=0 WHERE LobbyID=".$_SESSION['Lobby_ID'];
-		if(!mysqli_query($con, $sql)){
-			echo('Unable to return to the lobby');
+		if(isset($_SESSION['Host'])){
+			//This resets the GameID and Clue and then increments the dasher to be the next person in line
+			$sql = "UPDATE lobby lob SET lob.GameID=0, lob.Clue='', lob.DasherID=(SELECT IF(ISNULL(MIN(p.PlayerID)),";
+			$sql .= " (SELECT MIN(f.PlayerID) FROM players f WHERE f.LobbyID=".$_SESSION['Lobby_ID']."), MIN(p.PlayerID))";
+			$sql .= "FROM players p, games g WHERE g.GameID = (SELECT MAX(n.GameID) FROM games n WHERE n.LobbyID=".$_SESSION['Lobby_ID'].")";
+			$sql .= "AND p.LobbyID =".$_SESSION['Lobby_ID']." AND p.PlayerID > g.DasherID)";
+			$sql .= " WHERE lob.LobbyID=".$_SESSION['Lobby_ID'];
+			if(!mysqli_query($con, $sql)){
+				echo('Unable to return to the lobby');
+			}
 		}
 	default:			
 }
@@ -173,7 +180,7 @@ while($row = mysqli_fetch_row($result)){
 $sql = "SELECT p.PlayerName, p.PlayerID, l.HostID, l.DasherID, p.Score";
 $sql .= " FROM lobby l, players p";
 $sql .= " WHERE p.LobbyID = l.LobbyID AND l.LobbyID=".$_SESSION['Lobby_ID'];
-$sql .= " AND p.LastCheck > NOW() - INTERVAL 15 SECOND";
+$sql .= " AND p.LastCheck > NOW() - INTERVAL 30 SECOND ORDER BY p.PlayerID";
 if(!$playerlist = mysqli_query($con, $sql)){
 	echo('Cant find players in this game');
 }
@@ -220,7 +227,7 @@ while($row = mysqli_fetch_row($playerlist)){
 	}else {
 		$dasher = "";
 	}
-	echo '<div class="col-xs-6 col-sm-4 col-md-3'.$clicky.$dasher.'" data-playerid="'.$row[1].'">'.$row[0].$note;
+	echo '<div class="col-xs-6 col-sm-4 col-md-3 text-center'.$clicky.$dasher.'" data-playerid="'.$row[1].'">'.$row[0].$note;
 	echo '<span class="badge">'.$row[4].'</span></div>';
 }
 echo '</div><br>';
@@ -274,7 +281,7 @@ if(isset($_SESSION['Dasher'])){
 mysqli_close($con);
 ?>
 
-<div id="footer" class="text-center"><button type="button" class="btn btn-warning" onclick="mainMenu(1)">Return to Main</button></div>
+<div id="footer" class="container text-center"><button type="button" class="btn btn-warning" onclick="if(confirm('You want to Quit?')){mainMenu(1)}">Quit to Main</button></div>
 
 
 </body>

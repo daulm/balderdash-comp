@@ -19,14 +19,15 @@ $action_type = $_GET['mode'];
 switch ($action_type){
 	case "skip":
 		//The user did not submit a vote insert a blank vote anyway
-		$sql = "INSERT INTO votes (AnswerID, PlayerID) VALUES (0, ".$_SESSION['Player_ID'].")";
+		$sql = "INSERT INTO votes (AnswerID, PlayerID, GameID) VALUES (0, ";
+		$sql .= $_SESSION['Player_ID'].", ".$_SESSION['Game_ID'].")";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to save decision');
 		}
 		break;
 	case "submit":
-		$sql = "INSERT INTO votes (AnswerID, PlayerID) VALUES (";
-		$sql .= $_POST['ansid'].", ".$_SESSION['Player_ID'].")";
+		$sql = "INSERT INTO votes (AnswerID, PlayerID, GameID) VALUES (";
+		$sql .= $_POST['ansid'].", ".$_SESSION['Player_ID'].", ".$_SESSION['Game_ID'].")";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to save vote');
 		}		
@@ -49,7 +50,7 @@ if(isset($_SESSION['Dasher'])){
 		$donevote = TRUE;
 	}
 	// check if all players have submitted votes
-	$sql = "SELECT p.PlayerID FROM players p";
+	$sql = "SELECT p.PlayerID FROM players p, lobby l";
 	$sql .= " WHERE p.LobbyID = l.LobbyID AND l.LobbyID=".$_SESSION['Lobby_ID'];
 	$sql .= " AND NOT EXISTS (SELECT v.VoteID FROM votes v WHERE v.PlayerID = p.PlayerID";
 	$sql .= " AND v.GameID = l.GameID)";
@@ -71,27 +72,27 @@ if(isset($_SESSION['Dasher'])){
 			//players who submitted the correct answer
 			$sql = "UPDATE players p SET p.Score=p.Score+3 WHERE p.PlayerID IN";
 			$sql .= " (SELECT a1.PlayerID FROM answers a1, answers a2 WHERE a2.PlayerID =".$_SESSION['Player_ID'];
-			$sql .= " AND a1.BindAnswerID = a2.AnswerID AND a1.GameID=".$_SESSION['Game_ID'].")";
+			$sql .= " AND a2.AnswerID!=0 AND a1.BindAnswerID = a2.AnswerID AND a1.GameID=".$_SESSION['Game_ID'].")";
 			if(!mysqli_query($con, $sql)){
 				echo('Unable to score correct answers');
 			}
 			//players who voted for the correct answer
 			$sql = "UPDATE players p SET p.Score=p.Score+2 WHERE p.PlayerID IN";
-			$sql .= " (SELECT v.PlayerID FROM votes v, answers a, WHERE v.AnswerID = a.AnswerID";
+			$sql .= " (SELECT v.PlayerID FROM votes v, answers a WHERE v.AnswerID = a.AnswerID";
 			$sql .= " AND a.GameID=".$_SESSION['Game_ID']." AND a.PlayerID=".$_SESSION['Player_ID'].")";
 			if(!mysqli_query($con, $sql)){
 				echo('Unable to score correct votes');
 			}		
 			//players who received votes
 			$sql = "UPDATE players p SET p.Score=p.Score+(SELECT COUNT(v.VoteID) FROM votes v, answers a";
-			$sql .= " WHERE a.PlayerID=p.PlayerID AND v.AnswerID=a.AnswerID AND a.GameID="$_SESSION['Game_ID'];
-			$sql .= ") WHERE p.LobbyID=".$_SESSION['Lobby_ID'];
+			$sql .= " WHERE a.PlayerID=p.PlayerID AND v.AnswerID=a.AnswerID AND a.GameID=".$_SESSION['Game_ID'];
+			$sql .= ") WHERE p.LobbyID=".$_SESSION['Lobby_ID']." AND p.PlayerID!=".$_SESSION['Player_ID'];
 			if(!mysqli_query($con, $sql)){
 				echo('Unable to score correct votes');
 			}
 			//players who had the same answer as one that got votes
 			$sql = "UPDATE players p SET p.Score=p.Score+(SELECT COUNT(v.VoteID) FROM votes v, answers a, answers ab";
-			$sql .= " WHERE a.PlayerID=p.PlayerID AND v.AnswerID=a.BindAnswerID AND a.GameID="$_SESSION['Game_ID'];
+			$sql .= " WHERE a.PlayerID=p.PlayerID AND v.AnswerID=a.BindAnswerID AND a.GameID=".$_SESSION['Game_ID'];
 			$sql .= " AND ab.AnswerID=a.BindAnswerID AND ab.PlayerID!=".$_SESSION['Player_ID'].") WHERE p.LobbyID=".$_SESSION['Lobby_ID'];
 			if(!mysqli_query($con, $sql)){
 				echo('Unable to score votes for matching answers');
@@ -129,10 +130,9 @@ if(isset($_SESSION['Dasher'])){
 if($donevote){
 
 	//pull all answers and their votes
-	$sql = "SELECT a.AnswerID, a.AnswerText, p.PlayerName, p.PlayerID, p.Score, vp.PlayerName, vp.PlayerID";
-	$sql .= " FROM answers a, players p, players vp LEFT JOIN votes v ON v.AnswerID = a.AnswerID";
-	$sql .= " WHERE a.PlayerID = p.PlayerID AND a.GameID=".$_SESSION['Game_ID'];
-	$sql .= " AND vp.PlayerID = v.PlayerID";
+	$sql = "SELECT a.AnswerID, a.AnswerText, p.PlayerName, p.PlayerID, p.Score, vp.PlayerName, vp.PlayerID, g.DasherID";
+	$sql .= " FROM games g, players p, answers a LEFT JOIN votes v JOIN players vp ON vp.PlayerID = v.PlayerID ON a.AnswerID = v.AnswerID";
+	$sql .= " WHERE a.PlayerID = p.PlayerID AND a.GameID = g.GameID AND a.GameID=".$_SESSION['Game_ID'];
 	$sql .= " ORDER BY ISNULL(vp.PlayerName), a.AnswerID"; 
 	if(!$result = mysqli_query($con, $sql)){
 		echo('Cant find list of answers/votes.');
@@ -146,14 +146,14 @@ if($donevote){
 			echo '<div class="row"><span class="label label-'.$rstyle.'">'.$row[5].'</span></div>';
 		} else {
 			$rstyle = "active";
-			if($row[3] == $_SESSION['Player_ID']){
-				//this is the correct answer
-				$rstyle = "success";
-			}
 			if(!is_null($row[5])){
 				//this answer got votes	
 				$rstyle = "info";
 			}
+			if($row[3] == $row[7]){
+				//this is the correct answer
+				$rstyle = "success";
+			}			
 			echo '</div></div><div class="row">';
 			echo '	<div class="col-xs-3 text-center alert alert-'.$rstyle.'">'.$row[2].'<span class="badge">'.$row[4].'</span></div>';
 			echo '	<div class="col-xs-6 alert alert-'.$rstyle.'">'.$row[1].'</div>';
@@ -169,6 +169,7 @@ if($donevote){
 mysqli_close($con);
 ?>
 
-<div id="footer" class="container text-center"><button type="button" class="btn btn-warning" onclick="returnLobby()">Return to the Lobby</button></div>
+<div id="footer" class="container text-center"><button type="button" class="btn btn-info" onclick="returnLobby()">Return to the Lobby</button></div>
+<div id="footer" class="container text-center"><button type="button" class="btn btn-warning" onclick="if(confirm('You want to Quit?')){mainMenu(1)}">Quit to Main</button></div>
 </body>
 </html>

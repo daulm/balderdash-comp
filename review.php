@@ -74,7 +74,7 @@ switch ($action_type){
 					<?php
 				} else {
 					//An answer has been submitted
-					if(is_null($row[4])){
+					if($row[4] == 0){
 						//This answer is active and will be visible to players
 						?>
 						<tr id="<?php echo htmlspecialchars($row[2]) ?>">
@@ -102,7 +102,7 @@ switch ($action_type){
 				}
 			}
 			echo '</tbody></table></div>';
-			echo '<div id="footer" class="text-center"><button type="button" class="btn btn-info" onclick="launchVote()">Begin Voting</button></div>';
+			echo '<div id="footer" class="text-center"><button type="button" class="btn btn-info" onclick="launchVote(); submitVote(0)">Begin Voting</button></div>';
 		} else {
 			//look up the game state
 			$gamestate = "";
