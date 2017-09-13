@@ -62,7 +62,7 @@ if(isset($_SESSION['Dasher'])){
 	}
 	if($donevote){
 		// make sure we haven't already updated scores
-		$sql = "SELECT * FROM Lobby WHERE GameState='complete' AND LobbyID=".$_SESSION['Lobby_ID'];
+		$sql = "SELECT * FROM lobby WHERE GameState='complete' AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!$result = mysqli_query($con, $sql)){
 			echo('Unable to check if we already created game');
 		}
