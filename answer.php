@@ -30,7 +30,7 @@ while($row = mysqli_fetch_row($result)){
 //if host, set up new game and change game state of lobby
 if(isset($_SESSION['Host'])){
 	//check if the game was already created
-	$sql = "SELECT * FROM Lobby WHERE GameState='answer' AND LobbyID=".$_SESSION['Lobby_ID'];
+	$sql = "SELECT * FROM lobby WHERE GameState='answer' AND LobbyID=".$_SESSION['Lobby_ID'];
 	if(!$result = mysqli_query($con, $sql)){
 		echo('Unable to check if we already created game');
 	}
