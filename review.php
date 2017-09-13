@@ -6,6 +6,7 @@
 <body>
 <?php
 include 'db_config.php';
+session_name('bd');
 session_start();
 if (!isset($_SESSION['Player_ID'])){
 	die('Session lost, please reload the app.');
