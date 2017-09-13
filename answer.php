@@ -36,8 +36,9 @@ if(isset($_SESSION['Host'])){
 	}
 	if(mysqli_num_rows($result) == 0){
 		//create new game 
+		$sq_clue = mysqli_real_escape_string($con, $clue);
 		$sql = "INSERT INTO games (LobbyID, Clue, DasherID) VALUES (";
-		$sql .= $_SESSION['Lobby_ID'].", '".mysql_real_escape_string($clue)."', ".$dasherid.")";
+		$sql .= $_SESSION['Lobby_ID'].", '".$sq_clue."', ".$dasherid.")";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to create Game');
 		}

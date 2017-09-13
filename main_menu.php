@@ -55,7 +55,7 @@ if (isset($_SESSION['Player_ID'])) {
 } else {
 	$sql = "INSERT INTO players (PlayerName, LobbyID) VALUES ('Newbie', NULL)";
 	if(!mysqli_query($con, $sql)){
-		echo('Unable to add new players');
+		die('Unable to add new players');
 	}
 	$sql = "SELECT MAX(PlayerID) FROM players";
 	if(!$result = mysqli_query($con, $sql)){

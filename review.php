@@ -19,8 +19,9 @@ $action_type = $_GET['mode'];
 switch ($action_type){
 	case "submit":
 		// Add the answer
+		$sq_ans = mysqli_real_escape_string($con, $_POST['ans']);
 		$sql = "INSERT IGNORE INTO answers (GameID, PlayerID, AnswerText) VALUES (";
-		$sql .= $_SESSION['Game_ID'].", ".$_SESSION['Player_ID'].", '".mysql_real_escape_string($_POST['ans'])."')";
+		$sql .= $_SESSION['Game_ID'].", ".$_SESSION['Player_ID'].", '".$sq_ans."')";
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to submit the answer');
 		}
@@ -34,8 +35,9 @@ switch ($action_type){
 		}*/
 		break;
 	case "unbind":
+		$sq_ansid = mysqli_real_escape_string($con, $_POST['ansid']);
 		$sql = "UPDATE answers SET BindAnswerID=0";
-		$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['ansid']);
+		$sql .= " WHERE AnswerID=".$sq_ansid;
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to sync Game to Lobby');
 		}
@@ -44,8 +46,10 @@ switch ($action_type){
 		if(isset($_SESSION['Dasher'])){
 			if(isset($_POST['hideansid'])){
 				//the dasher wants to hide a similar answer behind another
-				$sql = "UPDATE answers SET BindAnswerID=".mysql_real_escape_string($_POST['bindansid']);
-				$sql .= " WHERE AnswerID=".mysql_real_escape_string($_POST['hideansid']);
+				$sq_bindid = mysqli_real_escape_string($con, $_POST['bindansid']);
+				$sq_hideid = mysqli_real_escape_string($con, $_POST['hideansid']);
+				$sql = "UPDATE answers SET BindAnswerID=".$sq_bindid;
+				$sql .= " WHERE AnswerID=".$sq_hideid;
 				if(!mysqli_query($con, $sql)){
 					echo('Unable to bind answers');
 				}	

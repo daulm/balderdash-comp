@@ -17,8 +17,9 @@ if (!$con){
 	
 if(isset($_SESSION['Dasher'])){
 	// change game state 
+	$sq_lob = mysqli_real_escape_string($con, $_SESSION['Lobby_ID']);
 	$sql = "UPDATE lobby SET GameState='vote'";
-	$sql .= " WHERE LobbyID=".mysql_real_escape_string($_SESSION['Lobby_ID']);
+	$sql .= " WHERE LobbyID=".$sq_lob;
 	$sql .= " AND GameState = 'answer' AND DasherID=".$_SESSION['Player_ID'];
 	if(!mysqli_query($con, $sql)){
 		echo('Unable update the gamestate');
@@ -34,7 +35,7 @@ if(isset($_SESSION['Dasher'])){
 } else {
 	//look to see if they have already voted
 	$sql = "SELECT v.VoteID FROM votes v, lobby l, answers a";
-	$sql .= " WHERE v.PlayerID=".mysql_real_escape_string($_SESSION['Player_ID']);
+	$sql .= " WHERE v.PlayerID=".$_SESSION['Player_ID'];
 	$sql .= " AND a.GameID = l.GameID AND v.AnswerID = a.AnswerID AND l.LobbyID =".$_SESSION['Lobby_ID'];
 	if(!$result = mysqli_query($con, $sql)){
 		echo('Unable check if I voted');

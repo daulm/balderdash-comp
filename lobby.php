@@ -51,9 +51,9 @@ switch ($action_type){
 		while($row = mysqli_fetch_row($result)){
 			$_SESSION['Lobby_ID'] = $row[0];
 		}
-		
+		$ply_name = mysqli_real_escape_string($con, $_POST['pname']);
 		//update the current lobby the player is in and their name
-		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".mysql_real_escape_string($_POST['pname'])."'";
+		$sql = "UPDATE players SET LobbyID=".$_SESSION['Lobby_ID'].", PlayerName='".$ply_name."'";
 		$sql .= " WHERE PlayerID=".$_SESSION['Player_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
@@ -64,7 +64,8 @@ switch ($action_type){
 		break;
 	case "join":
 		// check that the code is correct and the lobby was created in the past 24 hours
-		$sql = "SELECT MAX(LobbyID) FROM lobby WHERE Code=UPPER('".mysql_real_escape_string($_POST['code'])."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+		$sq_code = mysqli_real_escape_string($con, $_POST['code']);
+		$sql = "SELECT MAX(LobbyID) FROM lobby WHERE Code=UPPER('".$sq_code."') AND CreationTime > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
 		if(!$result = mysqli_query($con, $sql)){
 			echo('Cant find a Lobby with the given code.');
 		}		
@@ -76,8 +77,8 @@ switch ($action_type){
 		while($row = mysqli_fetch_row($result)){
 			$_SESSION['Lobby_ID'] = $row[0];
 		}
-		$code = mysql_real_escape_string($_POST['code']);
-		$pname = mysql_real_escape_string($_POST['pname']);
+		$code = mysqli_real_escape_string($con, $_POST['code']);
+		$pname = mysqli_real_escape_string($con, $_POST['pname']);
 		//If a player already exists with the chosen name, add [the number of current players] to the end of their name
 		$sql = "SELECT p.PlayerName, (SELECT COUNT(*) FROM players WHERE LobbyID =".$_SESSION['Lobby_ID'].") as num";
 		$sql .= " FROM players p, lobby l";
@@ -111,28 +112,33 @@ switch ($action_type){
 		}
 		break;
 	case "settings":
-		$sql = "UPDATE lobby SET AnswerTime=".mysql_real_escape_string($_POST['anstime']).", VoteTime=".mysql_real_escape_string($_POST['votetime']);
+		$sq_anstime = mysqli_real_escape_string($con, $_POST['anstime']);
+		$sq_votetime = mysqli_real_escape_string($con, $_POST['votetime']);
+		$sql = "UPDATE lobby SET AnswerTime=".$sq_anstime.", VoteTime=".$sq_votetime;
 		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}		
 		break;
 	case "clue":
-		$sql = "UPDATE lobby SET Clue='".mysql_real_escape_string($_POST['clue'])."'";
+		$sq_clue = mysqli_real_escape_string($con, $_POST['clue']);
+		$sql = "UPDATE lobby SET Clue='".$sq_clue."'";
 		$sql .= " WHERE DasherID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}
 		break;
 	case "dasher":
-		$sql = "UPDATE lobby SET DasherID=".mysql_real_escape_string($_POST['dasherid']);
+		$sq_dasher = mysqli_real_escape_string($con, $_POST['dasherid']);
+		$sql = "UPDATE lobby SET DasherID=".$sq_dasher;
 		$sql .= " WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'];
 		if(!mysqli_query($con, $sql)){
 			echo('Unable to add player ID to the lobby');
 		}
 		break;
 	case "dasherscore":
-		$sql = "UPDATE players SET Score=".mysql_real_escape_string($_POST['dasherscore']);
+		$sq_dscore = mysqli_real_escape_string($con, $_POST['dasherscore']);
+		$sql = "UPDATE players SET Score=".$sq_dscore;
 		$sql .= " WHERE PlayerID= (SELECT DasherID FROM lobby";
 		$sql .= "  WHERE HostID=".$_SESSION['Player_ID']." AND LobbyID=".$_SESSION['Lobby_ID'].")";
 		if(!mysqli_query($con, $sql)){
